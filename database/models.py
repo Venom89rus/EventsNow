@@ -1,15 +1,26 @@
-from sqlalchemy import Column, Integer, BigInteger, String, Float, Date, Time, DateTime, Text, ForeignKey, \
-    Enum as SQLEnum
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 from datetime import datetime
 from enum import Enum as PyEnum
-from typing import Optional
+
+from sqlalchemy import (
+    Column,
+    Integer,
+    BigInteger,
+    String,
+    Float,
+    Date,
+    Time,
+    DateTime,
+    Text,
+    ForeignKey,
+    Enum as SQLEnum,
+)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
 
-# ENUMs
+# ---------- ENUMs ----------
 class EventCategory(str, PyEnum):
     EXHIBITION = "EXHIBITION"
     MASTERCLASS = "MASTERCLASS"
@@ -20,9 +31,9 @@ class EventCategory(str, PyEnum):
 
 
 class EventStatus(str, PyEnum):
-    APPROVED_WAITING_PAYMENT = "approved_waiting_payment"
     DRAFT = "draft"
     PENDING_MODERATION = "pending_moderation"
+    APPROVED_WAITING_PAYMENT = "approved_waiting_payment"
     ACTIVE = "active"
     ARCHIVED = "archived"
     REJECTED = "rejected"
@@ -51,45 +62,48 @@ class CityStatus(str, PyEnum):
     COMING_SOON = "coming_soon"
 
 
-# Модель User
+# ---------- User ----------
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
+
     username = Column(String(255), nullable=True)
     first_name = Column(String(255), nullable=True)
     last_name = Column(String(255), nullable=True)
     phone = Column(String(20), nullable=True)
-    role = Column(SQLEnum(UserRole), default="resident")
+
+    role = Column(SQLEnum(UserRole), default=UserRole.RESIDENT)
     city_slug = Column(String(50), default="nojabrsk")
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Связи
+    # relationships
     events = relationship("Event", back_populates="organizer")
     payments = relationship("Payment", back_populates="organizer")
     comments = relationship("Comment", back_populates="user")
 
 
-# Модель City
+# ---------- City ----------
 class City(Base):
     __tablename__ = "cities"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     slug = Column(String(50), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
-    status = Column(SQLEnum(CityStatus), default="active")
+    status = Column(SQLEnum(CityStatus), default=CityStatus.ACTIVE)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
-# Модель Event (событие)
+# ---------- Event ----------
 class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
     city_slug = Column(String(50), nullable=False)
 
@@ -97,80 +111,90 @@ class Event(Base):
     category = Column(SQLEnum(EventCategory), nullable=False)
     description = Column(Text)
 
-    # Контакты организатора
-    contact_phone = Column(String(20))
+    # contacts
+    contact_phone = Column(String(50))
     contact_email = Column(String(255))
 
-    # Место проведения
+    # location
     location = Column(String(500))
 
-    # Цена для посетителей
+    # visitor pricing (simple)
     price_admission = Column(Float)
 
-    # ВРЕМЯ ДЛЯ DAILY событий (концерт, мастер-класс)
-    event_date = Column(Date)  # Одна дата
+    # visitor pricing (tiers / misc)
+    admission_price_json = Column(Text, nullable=True)  # JSON str: {"дети":300,"взрослые":600}
+    free_kids_upto_age = Column(Integer, nullable=True)
+    reject_reason = Column(Text, nullable=True)
+
+    # DAILY
+    event_date = Column(Date)
     event_time_start = Column(Time)
     event_time_end = Column(Time)
 
-    # ВРЕМЯ ДЛЯ PERIOD событий (выставка)
+    # PERIOD (exhibition)
     period_start = Column(Date)
     period_end = Column(Date)
     working_hours_start = Column(Time)
     working_hours_end = Column(Time)
 
-    # Статусы
-    status = Column(SQLEnum(EventStatus), default="draft")
-    payment_status = Column(SQLEnum(PaymentStatus), default="pending")
-
-    # Монетизация
-    payment_id = Column(Integer, ForeignKey("payments.id"))
+    # statuses
+    status = Column(SQLEnum(EventStatus), default=EventStatus.DRAFT)
+    payment_status = Column(SQLEnum(PaymentStatus), default=PaymentStatus.PENDING)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Связи
+    # relationships
     organizer = relationship("User", back_populates="events")
-    payment = relationship("Payment")
+
+    # 1 event -> 0/1 payment (через Payment.event_id)
+    payment = relationship(
+        "Payment",
+        back_populates="event",
+        uselist=False,
+    )
+
     comments = relationship("Comment", back_populates="event")
     favorites = relationship("Favorite", back_populates="event")
 
 
-# Модель Payment
+# ---------- Payment ----------
 class Payment(Base):
     __tablename__ = "payments"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
-    event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
+
+    # Один платёж на одно событие (если захочешь историю платежей — убери unique=True)
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=True, unique=True)
 
     category = Column(SQLEnum(EventCategory), nullable=False)
     pricing_model = Column(SQLEnum(PricingModel), nullable=False)
 
-    # DAILY модель
+    # DAILY packages
     package_daily = Column(String(50))  # "1_post", "3_posts"
     num_posts = Column(Integer)
 
-    # PERIOD модель
+    # PERIOD packages
     package_period = Column(String(50))  # "7_days", "30_days"
     num_days = Column(Integer)
 
     amount = Column(Float, nullable=False)
+    status = Column(SQLEnum(PaymentStatus), default=PaymentStatus.PENDING)
 
-    status = Column(SQLEnum(PaymentStatus), default="pending")
-
-    # Платёжная система
-    payment_system = Column(String(50))  # "yookassa", "telegram_payments"
+    payment_system = Column(String(50))  # "yookassa", "telegram_payments", "test"
     transaction_id = Column(String(255), unique=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
 
-    # Связи
+    # relationships
     organizer = relationship("User", back_populates="payments")
-    event = relationship("Event")
+    event = relationship("Event", back_populates="payment")
 
 
-# Модель Comment
+# ---------- Comment ----------
 class Comment(Base):
     __tablename__ = "comments"
 
@@ -180,15 +204,14 @@ class Comment(Base):
 
     text = Column(Text, nullable=False)
     rating = Column(Integer, nullable=True)  # 1-5
-
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Связи
+    # relationships
     event = relationship("Event", back_populates="comments")
     user = relationship("User", back_populates="comments")
 
 
-# Модель Favorite (избранное)
+# ---------- Favorite ----------
 class Favorite(Base):
     __tablename__ = "favorites"
 
@@ -196,15 +219,16 @@ class Favorite(Base):
     event_id = Column(Integer, ForeignKey("events.id"), primary_key=True)
     added_at = Column(DateTime, default=datetime.utcnow)
 
-    # Связи
+    # relationships
     event = relationship("Event", back_populates="favorites")
 
 
-# Модель Feedback
+# ---------- Feedback ----------
 class Feedback(Base):
     __tablename__ = "feedback"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
+
     message = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

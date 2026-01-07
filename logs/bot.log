@@ -566,3 +566,736 @@ aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: can't
 2026-01-08 03:13:10,322 - aiogram.event - INFO - Update id=605165345 is handled. Duration 360 ms by bot id=8341383973
 2026-01-08 03:13:12,355 - aiogram.event - INFO - Update id=605165346 is handled. Duration 140 ms by bot id=8341383973
 2026-01-08 03:13:14,547 - aiogram.event - INFO - Update id=605165347 is handled. Duration 235 ms by bot id=8341383973
+2026-01-08 03:50:20,281 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 03:50:20,315 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 03:50:20,315 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 03:51:56,340 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 03:51:56,341 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 03:51:56,663 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 03:52:17,874 - aiogram.event - INFO - Update id=605165348 is handled. Duration 348 ms by bot id=8341383973
+2026-01-08 03:52:20,528 - aiogram.event - INFO - Update id=605165349 is handled. Duration 330 ms by bot id=8341383973
+2026-01-08 03:52:22,447 - aiogram.event - INFO - Update id=605165350 is handled. Duration 318 ms by bot id=8341383973
+2026-01-08 03:52:26,468 - aiogram.event - INFO - Update id=605165351 is handled. Duration 391 ms by bot id=8341383973
+2026-01-08 03:52:35,447 - aiogram.event - INFO - Update id=605165352 is handled. Duration 432 ms by bot id=8341383973
+2026-01-08 03:52:46,297 - aiogram.event - INFO - Update id=605165353 is handled. Duration 290 ms by bot id=8341383973
+2026-01-08 03:53:11,840 - aiogram.event - INFO - Update id=605165354 is handled. Duration 146 ms by bot id=8341383973
+2026-01-08 03:53:16,182 - aiogram.event - INFO - Update id=605165355 is handled. Duration 125 ms by bot id=8341383973
+2026-01-08 03:53:21,642 - aiogram.event - INFO - Update id=605165356 is handled. Duration 435 ms by bot id=8341383973
+2026-01-08 03:53:26,802 - aiogram.event - INFO - Update id=605165357 is handled. Duration 146 ms by bot id=8341383973
+2026-01-08 03:53:30,664 - aiogram.event - INFO - Update id=605165358 is handled. Duration 119 ms by bot id=8341383973
+2026-01-08 03:53:36,788 - aiogram.event - INFO - Update id=605165359 is handled. Duration 142 ms by bot id=8341383973
+2026-01-08 03:53:38,804 - aiogram.event - INFO - Update id=605165360 is handled. Duration 227 ms by bot id=8341383973
+2026-01-08 03:53:41,529 - aiogram.event - INFO - Update id=605165361 is not handled. Duration 28 ms by bot id=8341383973
+2026-01-08 03:53:41,529 - aiogram.event - ERROR - Cause exception while process update id=605165361 by bot id=8341383973
+AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship Event.payment - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/relationships.py", line 2434, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ~~~~~~~~~~~~~~^
+        self.parent_persist_selectable,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        consider_as_foreign_keys=consider_as_foreign_keys,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/util.py", line 121, in join_condition
+    return Join._join_condition(
+           ~~~~~~~~~~~~~~~~~~~~^
+        a,
+        ^^
+    ...<2 lines>...
+        consider_as_foreign_keys=consider_as_foreign_keys,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/selectable.py", line 1441, in _join_condition
+    cls._joincond_trim_constraints(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        a, b, constraints, consider_as_foreign_keys
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/selectable.py", line 1586, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+    ...<5 lines>...
+    )
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'events' and 'payments'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/organizer_handler.py", line 588, in organizer_confirm
+    user = (await db.execute(select(User).where(User.telegram_id == tg_user.id))).scalar_one_or_none()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
+    result = context.switch(*args, **kwargs)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1633, in _execute_clauseelement
+    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
+                                                ~~~~~~~~~~~~~~~~~~~~~^
+        dialect=dialect,
+        ^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        linting=self.dialect.compiler_linting | compiler.WARN_LINTING,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 716, in _compile_w_cache
+    compiled_sql = self._compiler(
+        dialect,
+    ...<4 lines>...
+        **kw,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 324, in _compiler
+    return dialect.statement_compiler(dialect, self, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 1447, in __init__
+    Compiled.__init__(self, dialect, statement, **kwargs)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 887, in __init__
+    self.string = self.process(self.statement, **compile_kwargs)
+                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 933, in process
+    return obj._compiler_dispatch(self, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/visitors.py", line 138, in _compiler_dispatch
+    return meth(self, **kw)  # type: ignore  # noqa: E501
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 4782, in visit_select
+    compile_state = select_stmt._compile_state_factory(
+        select_stmt, self, **kwargs
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/base.py", line 701, in create_for_statement
+    return klass.create_for_statement(statement, compiler, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 447, in create_for_statement
+    return cls._create_orm_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~^
+        cast("Union[Select, FromStatement]", statement),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        **kw,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 1175, in _create_orm_context
+    _QueryEntity.to_compile_state(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        is_current_entities=True,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 2628, in to_compile_state
+    _MapperEntity(
+    ~~~~~~~~~~~~~^
+        compile_state,
+        ^^^^^^^^^^^^^^
+    ...<2 lines>...
+        is_current_entities,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 2708, in __init__
+    entity._post_inspect
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ~~~~~~~~~^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 2733, in _post_inspect
+    self._check_configure()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 2410, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 4227, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 4268, in _do_configure_registries
+    mapper._post_configure_properties()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 2427, in _post_configure_properties
+    prop.init()
+    ~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/interfaces.py", line 595, in init
+    self.do_init()
+    ~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/relationships.py", line 1657, in do_init
+    self._setup_join_conditions()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/relationships.py", line 1895, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ~~~~~~~~~~~~~^
+        parent_persist_selectable=self.parent.persist_selectable,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<14 lines>...
+        can_be_synced_fn=self._columns_are_mapped,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/relationships.py", line 2321, in __init__
+    self._determine_joins()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/relationships.py", line 2478, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+    ...<7 lines>...
+    ) from afe
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship Event.payment - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-01-08 03:53:51,855 - aiogram.event - INFO - Update id=605165362 is not handled. Duration 4 ms by bot id=8341383973
+2026-01-08 03:53:51,855 - aiogram.event - ERROR - Cause exception while process update id=605165362 by bot id=8341383973
+InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Event(events)]'. Original exception was: Could not determine join condition between parent/child tables on relationship Event.payment - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/organizer_handler.py", line 588, in organizer_confirm
+    user = (await db.execute(select(User).where(User.telegram_id == tg_user.id))).scalar_one_or_none()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 190, in greenlet_spawn
+    result = context.switch(*args, **kwargs)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1633, in _execute_clauseelement
+    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
+                                                ~~~~~~~~~~~~~~~~~~~~~^
+        dialect=dialect,
+        ^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        linting=self.dialect.compiler_linting | compiler.WARN_LINTING,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 716, in _compile_w_cache
+    compiled_sql = self._compiler(
+        dialect,
+    ...<4 lines>...
+        **kw,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 324, in _compiler
+    return dialect.statement_compiler(dialect, self, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 1447, in __init__
+    Compiled.__init__(self, dialect, statement, **kwargs)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 887, in __init__
+    self.string = self.process(self.statement, **compile_kwargs)
+                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 933, in process
+    return obj._compiler_dispatch(self, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/visitors.py", line 138, in _compiler_dispatch
+    return meth(self, **kw)  # type: ignore  # noqa: E501
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 4782, in visit_select
+    compile_state = select_stmt._compile_state_factory(
+        select_stmt, self, **kwargs
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/base.py", line 701, in create_for_statement
+    return klass.create_for_statement(statement, compiler, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 447, in create_for_statement
+    return cls._create_orm_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~^
+        cast("Union[Select, FromStatement]", statement),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        **kw,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 1175, in _create_orm_context
+    _QueryEntity.to_compile_state(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<2 lines>...
+        is_current_entities=True,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 2628, in to_compile_state
+    _MapperEntity(
+    ~~~~~~~~~~~~~^
+        compile_state,
+        ^^^^^^^^^^^^^^
+    ...<2 lines>...
+        is_current_entities,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 2708, in __init__
+    entity._post_inspect
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ~~~~~~~~~^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 2733, in _post_inspect
+    self._check_configure()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 2410, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 4227, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 4264, in _do_configure_registries
+    raise e
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Event(events)]'. Original exception was: Could not determine join condition between parent/child tables on relationship Event.payment - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-01-08 03:57:47,316 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 03:57:47,319 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 03:57:47,320 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 03:59:41,364 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 03:59:41,365 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 03:59:41,724 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 03:59:49,054 - aiogram.event - INFO - Update id=605165363 is handled. Duration 343 ms by bot id=8341383973
+2026-01-08 03:59:51,415 - aiogram.event - INFO - Update id=605165364 is handled. Duration 129 ms by bot id=8341383973
+2026-01-08 03:59:55,401 - aiogram.event - INFO - Update id=605165365 is handled. Duration 245 ms by bot id=8341383973
+2026-01-08 03:59:58,113 - aiogram.event - INFO - Update id=605165366 is handled. Duration 557 ms by bot id=8341383973
+2026-01-08 04:00:07,297 - aiogram.event - INFO - Update id=605165367 is handled. Duration 525 ms by bot id=8341383973
+2026-01-08 04:00:17,344 - aiogram.event - INFO - Update id=605165368 is handled. Duration 142 ms by bot id=8341383973
+2026-01-08 04:00:25,586 - aiogram.event - INFO - Update id=605165369 is handled. Duration 129 ms by bot id=8341383973
+2026-01-08 04:00:32,216 - aiogram.event - INFO - Update id=605165370 is handled. Duration 121 ms by bot id=8341383973
+2026-01-08 04:00:36,126 - aiogram.event - INFO - Update id=605165371 is handled. Duration 119 ms by bot id=8341383973
+2026-01-08 04:00:39,952 - aiogram.event - INFO - Update id=605165372 is handled. Duration 432 ms by bot id=8341383973
+2026-01-08 04:00:47,457 - aiogram.event - INFO - Update id=605165373 is handled. Duration 132 ms by bot id=8341383973
+2026-01-08 04:00:59,000 - aiogram.event - INFO - Update id=605165374 is handled. Duration 131 ms by bot id=8341383973
+2026-01-08 04:01:01,105 - aiogram.event - INFO - Update id=605165375 is handled. Duration 241 ms by bot id=8341383973
+2026-01-08 04:01:06,782 - aiogram.event - INFO - Update id=605165376 is not handled. Duration 58 ms by bot id=8341383973
+2026-01-08 04:01:06,783 - aiogram.event - ERROR - Cause exception while process update id=605165376 by bot id=8341383973
+OperationalError: (sqlite3.OperationalError) table events has no column named admission_price_json
+[SQL: INSERT INTO events (user_id, city_slug, title, category, description, contact_phone, contact_email, location, price_admission, admission_price_json, free_kids_upto_age, reject_reason, event_date, event_time_start, event_time_end, period_start, period_end, working_hours_start, working_hours_end, status, payment_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (823223744, 'nojabrsk', 'группа КИНО', 'CONCERT', 'Следовательно, перспективное планирование предопределяет высокую востребованность своевременного выполнения сверхзадачи. В частности, синтетическое т ... (409 characters truncated) ...  необходимость включения в производственный план целого ряда внеочередных мероприятий с учётом комплекса инновационных методов управления процессами.', '89765435678', None, 'ЗЕНИТ', 900.0, None, None, None, '2026-01-10', '19:00:00.000000', '21:00:00.000000', None, None, '19:00:00.000000', '21:00:00.000000', 'PENDING_MODERATION', 'PENDING', '2026-01-07 23:01:06.775814', '2026-01-07 23:01:06.775821')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlite3.OperationalError: table events has no column named admission_price_json
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/organizer_handler.py", line 646, in organizer_confirm
+    await db.flush()  # получить ev.id
+    ^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 787, in flush
+    await greenlet_spawn(self.sync_session.flush, objects=objects)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 203, in greenlet_spawn
+    result = context.switch(value)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 4331, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 4466, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 4427, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table events has no column named admission_price_json
+[SQL: INSERT INTO events (user_id, city_slug, title, category, description, contact_phone, contact_email, location, price_admission, admission_price_json, free_kids_upto_age, reject_reason, event_date, event_time_start, event_time_end, period_start, period_end, working_hours_start, working_hours_end, status, payment_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (823223744, 'nojabrsk', 'группа КИНО', 'CONCERT', 'Следовательно, перспективное планирование предопределяет высокую востребованность своевременного выполнения сверхзадачи. В частности, синтетическое т ... (409 characters truncated) ...  необходимость включения в производственный план целого ряда внеочередных мероприятий с учётом комплекса инновационных методов управления процессами.', '89765435678', None, 'ЗЕНИТ', 900.0, None, None, None, '2026-01-10', '19:00:00.000000', '21:00:00.000000', None, None, '19:00:00.000000', '21:00:00.000000', 'PENDING_MODERATION', 'PENDING', '2026-01-07 23:01:06.775814', '2026-01-07 23:01:06.775821')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-08 04:04:22,998 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 04:04:22,999 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 04:04:23,335 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:04:46,614 - aiogram.event - INFO - Update id=605165377 is handled. Duration 368 ms by bot id=8341383973
+2026-01-08 04:04:48,408 - aiogram.event - INFO - Update id=605165378 is handled. Duration 460 ms by bot id=8341383973
+2026-01-08 04:04:50,025 - aiogram.event - INFO - Update id=605165379 is handled. Duration 237 ms by bot id=8341383973
+2026-01-08 04:04:51,816 - aiogram.event - INFO - Update id=605165380 is handled. Duration 278 ms by bot id=8341383973
+2026-01-08 04:04:54,669 - aiogram.event - INFO - Update id=605165381 is handled. Duration 148 ms by bot id=8341383973
+2026-01-08 04:04:59,481 - aiogram.event - INFO - Update id=605165382 is handled. Duration 118 ms by bot id=8341383973
+2026-01-08 04:05:05,888 - aiogram.event - INFO - Update id=605165383 is handled. Duration 140 ms by bot id=8341383973
+2026-01-08 04:05:10,397 - aiogram.event - INFO - Update id=605165384 is handled. Duration 249 ms by bot id=8341383973
+2026-01-08 04:05:14,424 - aiogram.event - INFO - Update id=605165385 is handled. Duration 126 ms by bot id=8341383973
+2026-01-08 04:05:18,954 - aiogram.event - INFO - Update id=605165386 is handled. Duration 478 ms by bot id=8341383973
+2026-01-08 04:05:23,601 - aiogram.event - INFO - Update id=605165387 is handled. Duration 469 ms by bot id=8341383973
+2026-01-08 04:05:32,530 - aiogram.event - INFO - Update id=605165388 is handled. Duration 121 ms by bot id=8341383973
+2026-01-08 04:05:58,383 - aiogram.event - INFO - Update id=605165389 is handled. Duration 730 ms by bot id=8341383973
+2026-01-08 04:06:02,019 - aiogram.event - INFO - Update id=605165390 is handled. Duration 732 ms by bot id=8341383973
+2026-01-08 04:06:09,101 - aiogram.event - INFO - Update id=605165391 is handled. Duration 374 ms by bot id=8341383973
+2026-01-08 04:06:13,447 - aiogram.event - INFO - Update id=605165392 is handled. Duration 638 ms by bot id=8341383973
+2026-01-08 04:06:20,025 - aiogram.event - INFO - Update id=605165393 is handled. Duration 579 ms by bot id=8341383973
+2026-01-08 04:06:27,675 - aiogram.event - INFO - Update id=605165394 is handled. Duration 125 ms by bot id=8341383973
+2026-01-08 04:06:31,343 - aiogram.event - INFO - Update id=605165395 is handled. Duration 709 ms by bot id=8341383973

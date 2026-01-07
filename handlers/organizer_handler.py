@@ -1,12 +1,17 @@
 import html
+import json
+from datetime import date as ddate, datetime
 
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from sqlalchemy import select
 
 from config import ADMIN_IDS, CITIES, DEFAULT_CITY
+from database.session import get_db
+from database.models import User, UserRole, Event, EventCategory, EventStatus, PaymentStatus
 from services.payment_service import calculate_price, PricingError
 
 router = Router()
@@ -42,8 +47,8 @@ class OrganizerEvent(StatesGroup):
     admission_price_mode = State()     # for exhibition
     admission_price = State()          # float or dict tiers
 
-    free_kids_question = State()       # NEW: yes/no
-    free_kids_age = State()            # NEW: N
+    free_kids_question = State()       # yes/no
+    free_kids_age = State()            # N
 
     confirm = State()
 
@@ -51,6 +56,18 @@ class OrganizerEvent(StatesGroup):
 # ---------- helpers ----------
 def h(text) -> str:
     return html.escape(str(text)) if text is not None else ""
+
+
+def is_admin(user_id: int) -> bool:
+    return user_id in ADMIN_IDS
+
+
+def moderation_kb(event_id: int) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="✅ Разместить", callback_data=f"adm_ok:{event_id}")
+    kb.button(text="❌ Отклонить", callback_data=f"adm_no:{event_id}")
+    kb.adjust(1)
+    return kb.as_markup()
 
 
 def cities_kb_for_organizer() -> InlineKeyboardMarkup:
@@ -70,7 +87,7 @@ def categories_kb() -> InlineKeyboardMarkup:
     kb.button(text="🎭 Выступление", callback_data="org_cat:PERFORMANCE")
     kb.button(text="🎓 Лекция/семинар", callback_data="org_cat:LECTURE")
     kb.button(text="✨ Другое", callback_data="org_cat:OTHER")
-    kb.adjust(1)
+    kb.adjust(1)  # по одной кнопке в ряд
     return kb.as_markup()
 
 
@@ -100,12 +117,10 @@ def price_mode_kb() -> InlineKeyboardMarkup:
 
 
 def _parse_date(s: str):
-    from datetime import datetime
     return datetime.strptime(s, "%d.%m.%Y").date()
 
 
 def _parse_time(s: str):
-    from datetime import datetime
     return datetime.strptime(s, "%H:%M").time()
 
 
@@ -130,7 +145,7 @@ def _format_placement_short(placement: dict) -> str:
     package = placement.get("package_name") or placement.get("packagename") or placement.get("package") or "—"
     model = placement.get("model") or "—"
     days = placement.get("num_days") or placement.get("numdays")
-    posts = placement.get("num_items") or placement.get("num_posts") or placement.get("numitems")
+    posts = placement.get("num_items") or placement.get("num_posts") or placement.get("numitems") or placement.get("numposts")
     total = placement.get("total_price") or placement.get("totalprice") or placement.get("price")
 
     details = []
@@ -175,7 +190,8 @@ def _format_admission_price(data: dict) -> str:
     if ap is None:
         return "-"
     if isinstance(ap, (int, float)):
-        return f"{float(ap)}"
+        v = float(ap)
+        return str(int(v)) if v.is_integer() else str(v)
     if isinstance(ap, dict):
         order = ["все", "дети", "студенты", "взрослые", "пенсионеры"]
         parts = []
@@ -194,23 +210,19 @@ def _format_free_kids(data: dict) -> str:
 
 
 def _ticket_price_label(data: dict) -> str:
-    # Для концерта хотим именно такую подпись
     return "Стоимость билета от" if data.get("category") == "CONCERT" else "Цена билета"
 
 
 def _ticket_price_value(data: dict) -> str:
-    # Выставка: tiers по возрастам
     if data.get("category") == "EXHIBITION":
         return _format_admission_price(data)
 
-    # Остальные категории: одно число
     ap = data.get("admission_price")
     if ap is None:
         return "-"
 
     try:
         v = float(ap)
-        # убираем ".0" чтобы было красиво
         return str(int(v)) if v.is_integer() else str(v)
     except Exception:
         return str(ap)
@@ -316,8 +328,16 @@ async def organizer_description(message: Message, state: FSMContext):
 @router.message(OrganizerEvent.date_or_period)
 async def organizer_date_or_period(message: Message, state: FSMContext):
     text = (message.text or "").strip()
+
+    # Период разрешаем только для EXHIBITION
+    data = await state.get_data()
+    category = data.get("category")
+
     try:
         if "-" in text:
+            if category != "EXHIBITION":
+                await message.answer("Для этой категории нужен один день: <code>ДД.ММ.ГГГГ</code>", parse_mode="HTML")
+                return
             a, b = text.split("-", 1)
             start = _parse_date(a.strip())
             end = _parse_date(b.strip())
@@ -434,7 +454,6 @@ async def organizer_admission_price(message: Message, state: FSMContext):
     category = data.get("category")
     text = (message.text or "").strip()
 
-    # EXHIBITION: tiers by age
     if category == "EXHIBITION":
         mode = data.get("admission_price_mode", "one")
         keys = PRICE_TIER_PRESETS.get(mode, ["все"])
@@ -445,8 +464,6 @@ async def organizer_admission_price(message: Message, state: FSMContext):
             await message.answer(f"Неверный формат. Пример: <code>{h(example)}</code>", parse_mode="HTML")
             return
         await state.update_data(admission_price=tiers)
-
-    # Other categories: single price
     else:
         t = text.replace(",", ".")
         try:
@@ -456,10 +473,8 @@ async def organizer_admission_price(message: Message, state: FSMContext):
         except Exception:
             await message.answer("Введите число (например <code>0</code> или <code>1500</code>).", parse_mode="HTML")
             return
-
         await state.update_data(admission_price=price)
 
-    # after price -> ask about free kids
     await state.set_state(OrganizerEvent.free_kids_question)
     await message.answer(
         "Есть ли бесплатный вход детям до <b>N</b> лет?",
@@ -472,8 +487,6 @@ async def organizer_admission_price(message: Message, state: FSMContext):
 async def freekids_no(callback: CallbackQuery, state: FSMContext):
     await state.update_data(free_kids_upto_age=None)
     await callback.answer()
-
-    # считаем размещение и показываем превью
     await _finish_pricing_and_preview(callback.message, state)
 
 
@@ -496,16 +509,11 @@ async def freekids_age(message: Message, state: FSMContext):
         return
 
     await state.update_data(free_kids_upto_age=age)
-
-    # считаем размещение и показываем превью
     await _finish_pricing_and_preview(message, state)
 
 
 async def _finish_pricing_and_preview(message: Message, state: FSMContext):
     data = await state.get_data()
-
-    # --- placement calc ---
-    from datetime import date as ddate
 
     placement_info = None
     try:
@@ -527,36 +535,147 @@ async def _finish_pricing_and_preview(message: Message, state: FSMContext):
 @router.callback_query(F.data.startswith("org_confirm:"), OrganizerEvent.confirm)
 async def organizer_confirm(callback: CallbackQuery, state: FSMContext):
     action = callback.data.split(":")[1]
+
     if action == "no":
         await state.clear()
         await callback.message.answer("❌ Отменено. Можно начать заново: нажми «Организатор».")
         await callback.answer()
         return
 
+    # action == yes -> сохраняем в БД и отправляем на модерацию
     data = await state.get_data()
-    user_from = f"@{callback.from_user.username}" if callback.from_user.username else str(callback.from_user.id)
+    tg_user = callback.from_user
 
-    admin_text = (
-        "🛡️ <b>МОДЕРАЦИЯ: новая заявка</b>\n\n"
-        f"От: {h(user_from)}\n"
-        f"Город: {h(data['city_name'])} ({h(data['city_slug'])})\n"
-        f"Категория: {h(_format_category_ru(data['category']))}\n"
-        f"Название: {h(data['title'])}\n"
-        f"Описание: {h(data['description'])}\n"
-        f"Дата/период: {h(_format_period_or_date(data))}\n"
-        f"Время: {h(data['time_start'])} - {h(data['time_end'])}\n"
-        f"Место: {h(data['location'])}\n"
-        f"Контакты: {h(data['contact'])}\n"
-        f"{h(_ticket_price_label(data))}: {h(_ticket_price_value(data))}\n"
-        f"Бесплатно: {h(_format_free_kids(data))}\n"
-        f"Размещение: {h(_format_placement_short(data.get('placement')))}\n"
-    )
+    # подготовка полей
+    city_slug = data["city_slug"]
+    title = data["title"]
+    description = data["description"]
+    location = data["location"]
+    contact = data["contact"]
 
-    for admin_id in ADMIN_IDS:
+    category_code = data["category"]
+    category_enum = EventCategory(category_code)
+
+    free_kids_upto_age = data.get("free_kids_upto_age")
+
+    admission_price = data.get("admission_price")  # float или dict
+    admission_price_json = None
+    price_admission = None
+    if isinstance(admission_price, dict):
+        admission_price_json = json.dumps(admission_price, ensure_ascii=False)
+        price_admission = None
+    else:
         try:
-            await callback.bot.send_message(admin_id, admin_text, parse_mode="HTML")
+            price_admission = float(admission_price) if admission_price is not None else None
         except Exception:
-            pass
+            price_admission = None
+
+    # время/даты
+    event_date = data.get("event_date")
+    period_start = data.get("period_start")
+    period_end = data.get("period_end")
+
+    time_start = data.get("time_start")
+    time_end = data.get("time_end")
+
+    # placement
+    placement = data.get("placement") or {}
+    placement_total = placement.get("total_price") or placement.get("totalprice") or placement.get("price")
+    placement_package = placement.get("package_name") or placement.get("packagename") or placement.get("package")
+
+    async with get_db() as db:
+        # upsert user
+        user = (await db.execute(select(User).where(User.telegram_id == tg_user.id))).scalar_one_or_none()
+        if not user:
+            user = User(
+                telegram_id=tg_user.id,
+                username=tg_user.username,
+                first_name=tg_user.first_name,
+                last_name=tg_user.last_name,
+                role=UserRole.ORGANIZER,
+                city_slug=city_slug,
+            )
+            db.add(user)
+        else:
+            # обновим минимальные данные
+            user.username = tg_user.username
+            user.first_name = tg_user.first_name
+            user.last_name = tg_user.last_name
+            user.role = UserRole.ORGANIZER
+            user.city_slug = city_slug
+
+        # create event
+        ev = Event(
+            user_id=tg_user.id,
+            city_slug=city_slug,
+            title=title,
+            category=category_enum,
+            description=description,
+            contact_phone=contact,      # пока кладём всё сюда (тел/ник/ссылка)
+            contact_email=None,
+            location=location,
+            price_admission=price_admission,
+
+            # daily date/time
+            event_date=ddate.fromisoformat(event_date) if event_date else None,
+            event_time_start=datetime.strptime(time_start, "%H:%M").time() if time_start else None,
+            event_time_end=datetime.strptime(time_end, "%H:%M").time() if time_end else None,
+
+            # period date/time (выставка)
+            period_start=ddate.fromisoformat(period_start) if period_start else None,
+            period_end=ddate.fromisoformat(period_end) if period_end else None,
+            working_hours_start=datetime.strptime(time_start, "%H:%M").time() if time_start else None,
+            working_hours_end=datetime.strptime(time_end, "%H:%M").time() if time_end else None,
+
+            status=EventStatus.PENDING_MODERATION,
+            payment_status=PaymentStatus.PENDING,
+        )
+
+        # дополнительные поля (должны быть добавлены тобой в models.py)
+        if hasattr(ev, "admission_price_json"):
+            ev.admission_price_json = admission_price_json
+        if hasattr(ev, "free_kids_upto_age"):
+            ev.free_kids_upto_age = free_kids_upto_age
+        if hasattr(ev, "reject_reason"):
+            ev.reject_reason = None
+
+        # можно также сохранить placement в event, если добавишь поля позже
+        # сейчас достаточно показать это админу/организатору из текста
+
+        db.add(ev)
+        await db.flush()  # получить ev.id
+
+        # Формируем текст админу
+        user_from = f"@{tg_user.username}" if tg_user.username else str(tg_user.id)
+
+        admin_text = (
+            "🛡️ <b>МОДЕРАЦИЯ: новая заявка</b>\n\n"
+            f"ID заявки: <code>{ev.id}</code>\n"
+            f"От: {h(user_from)}\n"
+            f"Город: {h(CITIES.get(city_slug, {}).get('name', city_slug))} ({h(city_slug)})\n"
+            f"Категория: {h(_format_category_ru(category_code))}\n"
+            f"Название: {h(title)}\n"
+            f"Описание: {h(description)}\n"
+            f"Дата/период: {h(_format_period_or_date(data))}\n"
+            f"Время: {h(time_start)} - {h(time_end)}\n"
+            f"Место: {h(location)}\n"
+            f"Контакты: {h(contact)}\n"
+            f"{h(_ticket_price_label(data))}: {h(_ticket_price_value(data))}\n"
+            f"Бесплатно: {h(_format_free_kids(data))}\n"
+            f"Размещение: {h(_format_placement_short(placement))}\n"
+        )
+
+        # Отправляем всем админам
+        for admin_id in ADMIN_IDS:
+            try:
+                await callback.bot.send_message(
+                    admin_id,
+                    admin_text,
+                    parse_mode="HTML",
+                    reply_markup=moderation_kb(ev.id),
+                )
+            except Exception:
+                pass
 
     await state.clear()
     await callback.message.answer("✅ Заявка отправлена на модерацию. Ожидай подтверждения.")

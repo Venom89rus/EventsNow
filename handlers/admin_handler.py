@@ -1,4 +1,5 @@
 import html
+
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message, InlineKeyboardMarkup
 from aiogram.fsm.state import State, StatesGroup
@@ -64,16 +65,19 @@ async def admin_approve(callback: CallbackQuery, state: FSMContext):
         event.status = EventStatus.APPROVED_WAITING_PAYMENT
         event.reject_reason = None
 
-        await callback.message.edit_text(
-            callback.message.text + "\n\n✅ <b>Статус:</b> Одобрено. Ожидаем оплату.",
-            parse_mode="HTML",
-            reply_markup=None,
-        )
+        # обновляем сообщение админа (убираем кнопки)
+        if callback.message:
+            await callback.message.edit_text(
+                (callback.message.text or "") + "\n\n✅ <b>Статус:</b> Одобрено. Ожидаем оплату.",
+                parse_mode="HTML",
+                reply_markup=None,
+            )
 
         # сообщение организатору + кнопка оплатить
         await callback.bot.send_message(
             event.user_id,
-            "✅ <b>Одобрено.</b>\n\nОплатите размещение, после оплаты мероприятие появится в ленте города.",
+            "✅ <b>Одобрено.</b>\n\n"
+            "Оплатите размещение, после оплаты мероприятие появится в ленте города.",
             parse_mode="HTML",
             reply_markup=pay_kb(event.id),
         )
@@ -123,7 +127,6 @@ async def admin_reject_reason(message: Message, state: FSMContext):
         event.status = EventStatus.REJECTED
         event.reject_reason = reason
 
-        # уведомление организатору
         await message.bot.send_message(
             event.user_id,
             "❌ <b>Отклонено</b>\n\n"
@@ -145,9 +148,11 @@ async def organizer_pay_start(callback: CallbackQuery):
         if not event:
             await callback.answer("Заявка не найдена", show_alert=True)
             return
+
         if event.user_id != callback.from_user.id:
             await callback.answer("Это не ваша заявка", show_alert=True)
             return
+
         if event.status != EventStatus.APPROVED_WAITING_PAYMENT:
             await callback.answer("Оплата недоступна для текущего статуса", show_alert=True)
             return
@@ -172,11 +177,22 @@ async def organizer_pay_test(callback: CallbackQuery):
         if not event:
             await callback.answer("Заявка не найдена", show_alert=True)
             return
+
         if event.user_id != callback.from_user.id:
             await callback.answer("Это не ваша заявка", show_alert=True)
             return
+
         if event.status != EventStatus.APPROVED_WAITING_PAYMENT:
             await callback.answer("Оплата недоступна для текущего статуса", show_alert=True)
+            return
+
+        # защита от повторной "оплаты"
+        existing_payment = (
+            await db.execute(select(Payment).where(Payment.event_id == event.id))
+        ).scalar_one_or_none()
+        if existing_payment and existing_payment.status == PaymentStatus.COMPLETED:
+            await callback.message.answer("⚠️ Уже оплачено, мероприятие уже опубликовано.", parse_mode="HTML")
+            await callback.answer()
             return
 
         # создаём Payment (тест)
@@ -190,10 +206,8 @@ async def organizer_pay_test(callback: CallbackQuery):
             payment_system="test",
         )
         db.add(p)
-        await db.flush()  # чтобы p.id появился
 
         event.payment_status = PaymentStatus.COMPLETED
-        event.payment_id = p.id
         event.status = EventStatus.ACTIVE
 
         await callback.message.answer(
