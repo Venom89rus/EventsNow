@@ -1337,3 +1337,13 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table events has no 
 2026-01-08 04:23:45,779 - aiogram.event - INFO - Update id=605165419 is handled. Duration 262 ms by bot id=8341383973
 2026-01-08 04:23:50,827 - aiogram.event - INFO - Update id=605165420 is handled. Duration 541 ms by bot id=8341383973
 2026-01-08 04:23:53,335 - aiogram.event - INFO - Update id=605165421 is handled. Duration 476 ms by bot id=8341383973
+2026-01-08 04:36:01,500 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 04:36:01,506 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:36:01,506 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 04:36:19,214 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 04:36:19,215 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 04:36:19,534 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:36:24,628 - aiogram.event - INFO - Update id=605165422 is handled. Duration 356 ms by bot id=8341383973
+2026-01-08 04:36:26,550 - aiogram.event - INFO - Update id=605165423 is handled. Duration 141 ms by bot id=8341383973
+2026-01-08 04:36:29,430 - aiogram.event - INFO - Update id=605165424 is handled. Duration 1284 ms by bot id=8341383973
+2026-01-08 04:37:06,242 - aiogram.event - INFO - Update id=605165425 is handled. Duration 393 ms by bot id=8341383973
