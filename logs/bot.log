@@ -1347,3 +1347,37 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table events has no 
 2026-01-08 04:36:26,550 - aiogram.event - INFO - Update id=605165423 is handled. Duration 141 ms by bot id=8341383973
 2026-01-08 04:36:29,430 - aiogram.event - INFO - Update id=605165424 is handled. Duration 1284 ms by bot id=8341383973
 2026-01-08 04:37:06,242 - aiogram.event - INFO - Update id=605165425 is handled. Duration 393 ms by bot id=8341383973
+2026-01-08 04:42:18,331 - aiogram.event - INFO - Update id=605165426 is handled. Duration 460 ms by bot id=8341383973
+2026-01-08 04:42:21,915 - aiogram.event - INFO - Update id=605165427 is handled. Duration 483 ms by bot id=8341383973
+2026-01-08 04:42:23,722 - aiogram.event - INFO - Update id=605165428 is handled. Duration 772 ms by bot id=8341383973
+2026-01-08 04:42:41,461 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 04:42:41,464 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:42:41,464 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 04:42:52,355 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 04:42:52,355 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 04:42:52,689 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:42:59,896 - aiogram.event - INFO - Update id=605165429 is handled. Duration 353 ms by bot id=8341383973
+2026-01-08 04:43:01,762 - aiogram.event - INFO - Update id=605165430 is handled. Duration 126 ms by bot id=8341383973
+2026-01-08 04:43:04,834 - aiogram.event - INFO - Update id=605165431 is handled. Duration 1266 ms by bot id=8341383973
+2026-01-08 04:43:14,456 - aiogram.event - INFO - Update id=605165432 is handled. Duration 593 ms by bot id=8341383973
+2026-01-08 04:43:18,487 - aiogram.event - INFO - Update id=605165433 is handled. Duration 227 ms by bot id=8341383973
+2026-01-08 04:47:51,148 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 04:47:51,155 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:47:51,156 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 04:48:05,356 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 04:48:05,357 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 04:48:05,693 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 04:48:11,353 - aiogram.event - INFO - Update id=605165434 is handled. Duration 318 ms by bot id=8341383973
+2026-01-08 04:48:12,963 - aiogram.event - INFO - Update id=605165435 is handled. Duration 238 ms by bot id=8341383973
+2026-01-08 04:48:19,007 - aiogram.event - INFO - Update id=605165436 is handled. Duration 1184 ms by bot id=8341383973
+2026-01-08 04:48:23,902 - aiogram.event - INFO - Update id=605165437 is handled. Duration 242 ms by bot id=8341383973
+2026-01-08 04:48:25,345 - aiogram.event - INFO - Update id=605165438 is handled. Duration 228 ms by bot id=8341383973
+2026-01-08 04:48:29,879 - aiogram.event - INFO - Update id=605165439 is handled. Duration 128 ms by bot id=8341383973
+2026-01-08 04:48:34,018 - aiogram.event - INFO - Update id=605165440 is handled. Duration 239 ms by bot id=8341383973
+2026-01-08 04:48:39,076 - aiogram.event - INFO - Update id=605165441 is handled. Duration 125 ms by bot id=8341383973
+2026-01-08 04:48:42,167 - aiogram.event - INFO - Update id=605165442 is handled. Duration 754 ms by bot id=8341383973
+2026-01-08 04:48:48,380 - aiogram.event - INFO - Update id=605165443 is handled. Duration 278 ms by bot id=8341383973
+2026-01-08 04:48:54,765 - aiogram.event - INFO - Update id=605165444 is handled. Duration 682 ms by bot id=8341383973
+2026-01-08 04:48:57,155 - aiogram.event - INFO - Update id=605165445 is handled. Duration 400 ms by bot id=8341383973
+2026-01-08 04:48:59,459 - aiogram.event - INFO - Update id=605165446 is handled. Duration 359 ms by bot id=8341383973
+2026-01-08 04:49:11,926 - aiogram.event - INFO - Update id=605165447 is handled. Duration 149 ms by bot id=8341383973
