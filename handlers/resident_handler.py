@@ -1,5 +1,4 @@
 import html
-import json
 from datetime import date, timedelta
 
 from aiogram import Router, F
@@ -9,7 +8,6 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     ReplyKeyboardMarkup,
     KeyboardButton,
-    ReplyKeyboardRemove,
 )
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -27,28 +25,31 @@ EVENTS_LIMIT_DEFAULT = 5
 DESC_PREVIEW_LEN = 100
 
 
-# ---------- FSM for Resident mode ----------
+# ---------- FSM ----------
 class ResidentState(StatesGroup):
     choosing_city = State()
-    browsing = State()  # city выбран, можно фильтровать
+    browsing = State()
 
 
+# ---------- basics ----------
 def h(x) -> str:
     return html.escape(str(x)) if x is not None else ""
 
 
-# ---------- Reply keyboards ----------
-def main_menu_kb() -> ReplyKeyboardMarkup:
-    # Если у тебя главная клавиатура строится в другом месте — скажи, интегрируем туда.
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="🏠 Житель"), KeyboardButton(text="🎪 Организатор")],
-            [KeyboardButton(text="🛡 Админ"), KeyboardButton(text="✍️ Обратная связь")],
-        ],
-        resize_keyboard=True,
-    )
+def compact(text: str | None) -> str:
+    if not text:
+        return ""
+    return " ".join(text.split())
 
 
+def short(text: str | None, limit: int = DESC_PREVIEW_LEN) -> str:
+    t = compact(text)
+    if not t:
+        return "—"
+    return t if len(t) <= limit else t[:limit].rstrip() + "…"
+
+
+# ---------- reply keyboard (нижнее меню жителя) ----------
 def resident_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -60,7 +61,7 @@ def resident_menu_kb() -> ReplyKeyboardMarkup:
     )
 
 
-# ---------- Inline keyboard for city picking ----------
+# ---------- cities inline keyboard ----------
 def _cities_sorted():
     return sorted(CITIES.items(), key=lambda x: x[1]["name"])
 
@@ -95,8 +96,8 @@ def cities_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# ---------- Formatting helpers ----------
-def _category_ru(cat: EventCategory | str) -> str:
+# ---------- formatting ----------
+def category_ru(cat: EventCategory | str) -> str:
     code = cat.value if hasattr(cat, "value") else str(cat)
     mapping = {
         "EXHIBITION": "Выставка",
@@ -109,7 +110,20 @@ def _category_ru(cat: EventCategory | str) -> str:
     return mapping.get(code, code)
 
 
-def _format_event_datetime(e: Event) -> str:
+def category_emoji(cat: EventCategory | str) -> str:
+    code = cat.value if hasattr(cat, "value") else str(cat)
+    mapping = {
+        "EXHIBITION": "🖼",
+        "MASTERCLASS": "🧑‍🏫",
+        "CONCERT": "🎤",
+        "PERFORMANCE": "🎭",
+        "LECTURE": "🎓",
+        "OTHER": "✨",
+    }
+    return mapping.get(code, "✨")
+
+
+def fmt_when(e: Event) -> str:
     if e.event_date:
         ds = e.event_date.strftime("%d.%m.%Y")
         ts = e.event_time_start.strftime("%H:%M") if e.event_time_start else "—"
@@ -126,64 +140,22 @@ def _format_event_datetime(e: Event) -> str:
     return "—"
 
 
-def _fmt_rub(value) -> str:
-    if value is None:
+def fmt_price(e: Event) -> str:
+    if e.price_admission is None:
         return "—"
     try:
-        v = float(value)
-        if v.is_integer():
-            return f"{int(v)} ₽"
-        return f"{v} ₽"
+        v = float(e.price_admission)
+        s = str(int(v)) if v.is_integer() else str(v)
     except Exception:
-        return f"{value} ₽"
+        s = str(e.price_admission)
+
+    # Концерт — "от"
+    if e.category == EventCategory.CONCERT:
+        return f"от {s} ₽"
+    return f"{s} ₽"
 
 
-def _format_admission_value(e: Event) -> str:
-    apj = getattr(e, "admission_price_json", None)
-    if apj:
-        try:
-            data = json.loads(apj)
-            if isinstance(data, dict) and data:
-                order = ["все", "дети", "студенты", "взрослые", "пенсионеры"]
-                parts = []
-                for k in order:
-                    if k in data:
-                        parts.append(f"{k}: {_fmt_rub(data[k])}")
-                for k, v in data.items():
-                    if k not in order:
-                        parts.append(f"{k}: {_fmt_rub(v)}")
-                return ", ".join(parts)
-        except Exception:
-            pass
-    return _fmt_rub(e.price_admission)
-
-
-def _price_label(e: Event) -> str:
-    return "Цена билета от" if e.category == EventCategory.CONCERT else "Цена билета"
-
-
-def _format_free_kids(e: Event) -> str | None:
-    age = getattr(e, "free_kids_upto_age", None)
-    if age is None:
-        return None
-    return f"Бесплатно: детям до {age} лет"
-
-
-def _compact(text: str | None) -> str:
-    if not text:
-        return ""
-    return " ".join(text.split())
-
-
-def _short_description(text: str | None, limit: int = DESC_PREVIEW_LEN) -> str:
-    t = _compact(text)
-    if not t:
-        return "—"
-    if len(t) <= limit:
-        return t
-    return t[:limit].rstrip() + "…"
-
-
+# ---------- filtering ----------
 def _event_overlaps_range_condition(date_from: date, date_to: date):
     return or_(
         and_(Event.event_date.is_not(None), Event.event_date >= date_from, Event.event_date <= date_to),
@@ -196,58 +168,7 @@ def _event_overlaps_range_condition(date_from: date, date_to: date):
     )
 
 
-# ---------- Inline "Подробнее" (оставляем как есть) ----------
-def event_preview_kb(event_id: int, can_expand: bool) -> InlineKeyboardMarkup:
-    kb = InlineKeyboardBuilder()
-    if can_expand:
-        kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}")
-    kb.adjust(1)
-    return kb.as_markup()
-
-
-def event_details_kb(event_id: int) -> InlineKeyboardMarkup:
-    kb = InlineKeyboardBuilder()
-    kb.button(text="⬅️ Назад", callback_data=f"res_event_close:{event_id}")
-    kb.adjust(1)
-    return kb.as_markup()
-
-
-def _event_preview_text(e: Event) -> str:
-    price_line = f"{_price_label(e)}: {h(_format_admission_value(e))}"
-    free_kids = _format_free_kids(e)
-
-    text = (
-        f"<b>{h(e.title)}</b>\n"
-        f"Категория: {h(_category_ru(e.category))}\n"
-        f"Когда: {h(_format_event_datetime(e))}\n"
-        f"Где: {h(e.location)}\n"
-        f"{price_line}\n"
-    )
-    if free_kids:
-        text += f"{h(free_kids)}\n"
-    text += f"Описание: {h(_short_description(e.description))}"
-    return text
-
-
-def _event_details_text(e: Event) -> str:
-    price_line = f"{_price_label(e)}: {h(_format_admission_value(e))}"
-    free_kids = _format_free_kids(e)
-
-    text = (
-        f"📄 <b>{h(e.title)}</b>\n\n"
-        f"Категория: {h(_category_ru(e.category))}\n"
-        f"Когда: {h(_format_event_datetime(e))}\n"
-        f"Где: {h(e.location)}\n"
-        f"{price_line}\n"
-    )
-    if free_kids:
-        text += f"{h(free_kids)}\n"
-    text += "\n"
-    text += f"<b>Описание:</b>\n{h(_compact(e.description) or '—')}"
-    return text
-
-
-async def _fetch_events(city_slug: str, mode: str):
+async def fetch_events(city_slug: str, mode: str):
     today = date.today()
 
     where = [Event.city_slug == city_slug, Event.status == EventStatus.ACTIVE]
@@ -266,20 +187,57 @@ async def _fetch_events(city_slug: str, mode: str):
 
     async with get_db() as db:
         events = (
-            await db.execute(
-                select(Event)
-                .where(*where)
-                .order_by(*order_by)
-                .limit(EVENTS_LIMIT_DEFAULT)
-            )
+            await db.execute(select(Event).where(*where).order_by(*order_by).limit(EVENTS_LIMIT_DEFAULT))
         ).scalars().all()
 
     return events, mode
 
 
+# ---------- inline details (in-place edit) ----------
+def event_preview_kb(event_id: int, can_expand: bool) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    if can_expand:
+        kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}")
+    kb.adjust(1)
+    return kb.as_markup()
+
+
+def event_details_kb(event_id: int) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="⬅️ Назад", callback_data=f"res_event_close:{event_id}")
+    kb.adjust(1)
+    return kb.as_markup()
+
+
+def event_preview_text(e: Event) -> str:
+    cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
+    return (
+        f"🎫 <b>{h(e.title)}</b>\n"
+        f"🏷 <b>{h(cat)}</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📅 <b>Когда:</b> {h(fmt_when(e))}\n"
+        f"📍 <b>Где:</b> {h(e.location)}\n"
+        f"💳 <b>Цена:</b> {h(fmt_price(e))}\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📝 <b>Описание:</b> {h(short(e.description))}"
+    )
+
+
+def event_details_text(e: Event) -> str:
+    cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
+    return (
+        f"📄 <b>{h(e.title)}</b>\n"
+        f"🏷 <b>{h(cat)}</b>\n"
+        f"🏙 <b>{h(e.city_slug)}</b>\n\n"
+        f"📅 <b>Когда:</b> {h(fmt_when(e))}\n"
+        f"📍 <b>Где:</b> {h(e.location)}\n"
+        f"💳 <b>Цена:</b> {h(fmt_price(e))}\n\n"
+        f"📝 <b>Описание:</b>\n{h(compact(e.description) or '—')}"
+    )
+
+
 async def send_events_list(message: Message, city_slug: str, mode: str):
     city_name = CITIES.get(city_slug, {}).get("name", city_slug)
-
     title_map = {
         "last": "🆕 Последние мероприятия",
         "today": "🕘 Мероприятия на сегодня",
@@ -288,7 +246,7 @@ async def send_events_list(message: Message, city_slug: str, mode: str):
         "30d": "🗓 Мероприятия на месяц",
     }
 
-    events, mode = await _fetch_events(city_slug, mode)
+    events, mode = await fetch_events(city_slug, mode)
 
     await message.answer(
         f"🏠 <b>События города: {h(city_name)}</b>\n"
@@ -302,28 +260,30 @@ async def send_events_list(message: Message, city_slug: str, mode: str):
         return
 
     for e in events:
-        full_desc = _compact(e.description)
+        full_desc = compact(e.description)
         can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
         await message.answer(
-            _event_preview_text(e),
+            event_preview_text(e),
             parse_mode="HTML",
             reply_markup=event_preview_kb(e.id, can_expand),
         )
 
 
-# ---------- Entry / City choosing ----------
+# ---------- entry ----------
 @router.message(F.text == "🏠 Житель")
 async def resident_entry(message: Message, state: FSMContext):
     await state.clear()
     await state.set_state(ResidentState.choosing_city)
 
-    # меняем нижнее меню на “фильтры + назад”
+    default_city_name = CITIES.get(DEFAULT_CITY, {}).get("name", "Город не задан")
     await message.answer(
-        "🏠 <b>Житель</b>\n\n👇 Выбери город:",
+        f"🏠 <b>Житель</b>\n\n"
+        f"🌍 По умолчанию: <b>{h(default_city_name)}</b>\n\n"
+        "👇 Выбери город:",
         reply_markup=resident_menu_kb(),
         parse_mode="HTML",
     )
-    await message.answer("Список городов:", reply_markup=cities_keyboard(page=0))
+    await message.answer("Список городов:", reply_markup=cities_keyboard(page=0), parse_mode="HTML")
 
 
 @router.callback_query(F.data.startswith("res_page:"))
@@ -365,7 +325,7 @@ async def resident_city_select(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# ---------- Resident reply-menu фильтры ----------
+# ---------- resident menu filters ----------
 @router.message(F.text.in_({"🕘 Сегодня", "📆 3 дня", "📅 Неделя", "🗓 Месяц", "🆕 Последние"}))
 async def resident_filters(message: Message, state: FSMContext):
     data = await state.get_data()
@@ -387,18 +347,22 @@ async def resident_filters(message: Message, state: FSMContext):
     await send_events_list(message, city_slug, mode=mode)
 
 
-@router.message(F.text == "⬅️ Назад")
-async def resident_back(message: Message, state: FSMContext):
-    # Возвращаем главное меню (нижняя клавиатура) и выходим из “режима жителя”
-    await state.clear()
-    await message.answer(
-        "Главное меню:",
-        reply_markup=main_menu_kb(),
-        parse_mode="HTML",
+def main_menu_kb() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🏠 Житель"), KeyboardButton(text="🎪 Организатор")],
+            [KeyboardButton(text="🛡 Админ"), KeyboardButton(text="✍️ Обратная связь")],
+        ],
+        resize_keyboard=True,
     )
 
+@router.message(F.text == "⬅️ Назад")
+async def resident_back(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Главное меню:", reply_markup=main_menu_kb())
 
-# ---------- Inline “Подробнее” (edit in-place) ----------
+
+# ---------- inline: open/close details in place ----------
 @router.callback_query(F.data.startswith("res_event_open:"))
 async def resident_event_open(callback: CallbackQuery):
     event_id = int(callback.data.split(":")[1])
@@ -411,7 +375,7 @@ async def resident_event_open(callback: CallbackQuery):
         return
 
     await callback.message.edit_text(
-        _event_details_text(e),
+        event_details_text(e),
         parse_mode="HTML",
         reply_markup=event_details_kb(event_id),
     )
@@ -429,11 +393,11 @@ async def resident_event_close(callback: CallbackQuery):
         await callback.answer("Событие не найдено", show_alert=True)
         return
 
-    full_desc = _compact(e.description)
+    full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
 
     await callback.message.edit_text(
-        _event_preview_text(e),
+        event_preview_text(e),
         parse_mode="HTML",
         reply_markup=event_preview_kb(event_id, can_expand),
     )

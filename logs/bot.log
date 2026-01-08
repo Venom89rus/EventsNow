@@ -1607,3 +1607,38 @@ AttributeError: type object 'Event' has no attribute 'createdat'. Did you mean: 
 2026-01-08 10:40:13,179 - aiogram.event - INFO - Update id=605165510 is handled. Duration 251 ms by bot id=8341383973
 2026-01-08 10:40:16,121 - aiogram.event - INFO - Update id=605165511 is handled. Duration 1445 ms by bot id=8341383973
 2026-01-08 10:45:23,429 - aiogram.event - INFO - Update id=605165512 is handled. Duration 388 ms by bot id=8341383973
+2026-01-08 10:48:31,717 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 10:48:31,739 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 10:48:31,742 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 10:48:37,938 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 10:48:37,939 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 10:48:38,260 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 10:48:45,568 - aiogram.event - INFO - Update id=605165513 is handled. Duration 314 ms by bot id=8341383973
+2026-01-08 10:48:54,041 - aiogram.event - INFO - Update id=605165514 is handled. Duration 261 ms by bot id=8341383973
+2026-01-08 10:48:57,482 - aiogram.event - INFO - Update id=605165515 is handled. Duration 1671 ms by bot id=8341383973
+2026-01-08 10:49:10,803 - aiogram.event - INFO - Update id=605165516 is handled. Duration 454 ms by bot id=8341383973
+2026-01-08 10:49:15,534 - aiogram.event - INFO - Update id=605165517 is handled. Duration 266 ms by bot id=8341383973
+2026-01-08 10:49:50,044 - aiogram.event - INFO - Update id=605165518 is handled. Duration 128 ms by bot id=8341383973
+2026-01-08 10:49:54,277 - aiogram.event - INFO - Update id=605165519 is handled. Duration 119 ms by bot id=8341383973
+2026-01-08 10:50:00,737 - aiogram.event - INFO - Update id=605165520 is handled. Duration 123 ms by bot id=8341383973
+2026-01-08 10:50:02,159 - aiogram.event - INFO - Update id=605165521 is handled. Duration 125 ms by bot id=8341383973
+2026-01-08 10:50:02,692 - aiogram.event - INFO - Update id=605165522 is handled. Duration 149 ms by bot id=8341383973
+2026-01-08 10:50:02,930 - aiogram.event - INFO - Update id=605165523 is handled. Duration 114 ms by bot id=8341383973
+2026-01-08 10:55:03,791 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 10:55:03,798 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 10:55:03,798 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 10:55:03,969 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 10:55:09,353 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 10:55:09,354 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 10:55:09,709 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 10:55:18,282 - aiogram.event - INFO - Update id=605165524 is handled. Duration 322 ms by bot id=8341383973
+2026-01-08 10:55:29,155 - aiogram.event - INFO - Update id=605165525 is handled. Duration 246 ms by bot id=8341383973
+2026-01-08 10:55:33,739 - aiogram.event - INFO - Update id=605165526 is handled. Duration 1496 ms by bot id=8341383973
+2026-01-08 10:55:38,945 - aiogram.event - INFO - Update id=605165527 is handled. Duration 426 ms by bot id=8341383973
+2026-01-08 10:55:43,883 - aiogram.event - INFO - Update id=605165528 is handled. Duration 598 ms by bot id=8341383973
+2026-01-08 10:55:46,447 - aiogram.event - INFO - Update id=605165529 is handled. Duration 1112 ms by bot id=8341383973
+2026-01-08 10:55:47,993 - aiogram.event - INFO - Update id=605165530 is handled. Duration 246 ms by bot id=8341383973
+2026-01-08 10:55:54,536 - aiogram.event - INFO - Update id=605165531 is handled. Duration 606 ms by bot id=8341383973
+2026-01-08 10:56:00,409 - aiogram.event - INFO - Update id=605165532 is handled. Duration 853 ms by bot id=8341383973
+2026-01-08 10:56:11,254 - aiogram.event - INFO - Update id=605165533 is handled. Duration 412 ms by bot id=8341383973
+2026-01-08 10:56:13,970 - aiogram.event - INFO - Update id=605165534 is handled. Duration 645 ms by bot id=8341383973
