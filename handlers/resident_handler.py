@@ -12,7 +12,7 @@ from aiogram.types import (
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from sqlalchemy import select, desc, and_, or_
+from sqlalchemy import select, desc, and_, or_, func
 
 from config import CITIES, DEFAULT_CITY
 from database.session import get_db
@@ -171,23 +171,39 @@ def _event_overlaps_range_condition(date_from: date, date_to: date):
 async def fetch_events(city_slug: str, mode: str):
     today = date.today()
 
-    where = [Event.city_slug == city_slug, Event.status == EventStatus.ACTIVE]
+    where = [
+        Event.city_slug == city_slug,
+        Event.status == EventStatus.ACTIVE,
+    ]
+
+    # "дата старта" мероприятия: для daily берём event_date, для period — period_start
+    start_dt = func.coalesce(Event.event_date, Event.period_start)
+
+    # по умолчанию: "Последние" (по добавлению)
     order_by = [desc(Event.created_at)]
 
     if mode == "today":
         where.append(_event_overlaps_range_condition(today, today))
-        order_by = [Event.event_date.asc().nullslast(), Event.period_start.asc().nullslast(), desc(Event.created_at)]
+        order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
+
     elif mode in ("3d", "7d", "30d"):
         days = int(mode.replace("d", ""))
         d2 = today + timedelta(days=days - 1)
         where.append(_event_overlaps_range_condition(today, d2))
-        order_by = [Event.event_date.asc().nullslast(), Event.period_start.asc().nullslast(), desc(Event.created_at)]
+        order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
+
     else:
         mode = "last"
+        order_by = [desc(Event.created_at)]
 
     async with get_db() as db:
         events = (
-            await db.execute(select(Event).where(*where).order_by(*order_by).limit(EVENTS_LIMIT_DEFAULT))
+            await db.execute(
+                select(Event)
+                .where(*where)
+                .order_by(*order_by)
+                .limit(EVENTS_LIMIT_DEFAULT)
+            )
         ).scalars().all()
 
     return events, mode

@@ -1642,3 +1642,21 @@ AttributeError: type object 'Event' has no attribute 'createdat'. Did you mean: 
 2026-01-08 10:56:00,409 - aiogram.event - INFO - Update id=605165532 is handled. Duration 853 ms by bot id=8341383973
 2026-01-08 10:56:11,254 - aiogram.event - INFO - Update id=605165533 is handled. Duration 412 ms by bot id=8341383973
 2026-01-08 10:56:13,970 - aiogram.event - INFO - Update id=605165534 is handled. Duration 645 ms by bot id=8341383973
+2026-01-08 11:03:45,457 - aiogram.event - INFO - Update id=605165535 is handled. Duration 142 ms by bot id=8341383973
+2026-01-08 11:03:47,819 - aiogram.event - INFO - Update id=605165536 is handled. Duration 433 ms by bot id=8341383973
+2026-01-08 11:03:50,195 - aiogram.event - INFO - Update id=605165537 is handled. Duration 1288 ms by bot id=8341383973
+2026-01-08 11:04:04,994 - aiogram.event - INFO - Update id=605165538 is handled. Duration 823 ms by bot id=8341383973
+2026-01-08 11:04:13,438 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 11:04:13,441 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 11:04:13,441 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-08 11:04:13,573 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 11:04:13,680 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-08 11:04:19,149 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-08 11:04:19,150 - aiogram.dispatcher - INFO - Start polling
+2026-01-08 11:04:19,483 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-08 11:04:24,887 - aiogram.event - INFO - Update id=605165539 is handled. Duration 329 ms by bot id=8341383973
+2026-01-08 11:04:29,544 - aiogram.event - INFO - Update id=605165540 is handled. Duration 249 ms by bot id=8341383973
+2026-01-08 11:04:31,828 - aiogram.event - INFO - Update id=605165541 is handled. Duration 1080 ms by bot id=8341383973
+2026-01-08 11:04:37,416 - aiogram.event - INFO - Update id=605165542 is handled. Duration 1153 ms by bot id=8341383973
+2026-01-08 11:04:46,815 - aiogram.event - INFO - Update id=605165543 is handled. Duration 342 ms by bot id=8341383973
+2026-01-08 11:04:49,328 - aiogram.event - INFO - Update id=605165544 is handled. Duration 238 ms by bot id=8341383973
