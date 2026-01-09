@@ -16,13 +16,14 @@ from sqlalchemy import select, desc, and_, or_, func
 
 from config import CITIES, DEFAULT_CITY
 from database.session import get_db
-from database.models import Event, EventStatus, EventCategory
+from database.models import Event, EventStatus, EventCategory, EventPhoto
 
 router = Router()
 
 CITIES_PER_PAGE = 5
 EVENTS_LIMIT_DEFAULT = 5
 DESC_PREVIEW_LEN = 100
+MAX_PHOTOS = 5
 
 
 # ---------- FSM ----------
@@ -56,6 +57,16 @@ def resident_menu_kb() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="🕘 Сегодня"), KeyboardButton(text="📆 3 дня"), KeyboardButton(text="📅 Неделя")],
             [KeyboardButton(text="🗓 Месяц"), KeyboardButton(text="🆕 Последние")],
             [KeyboardButton(text="⬅️ Назад")],
+        ],
+        resize_keyboard=True,
+    )
+
+
+def main_menu_kb() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🏠 Житель"), KeyboardButton(text="🎪 Организатор")],
+            [KeyboardButton(text="🛡 Админ"), KeyboardButton(text="✍️ Обратная связь")],
         ],
         resize_keyboard=True,
     )
@@ -114,7 +125,7 @@ def category_emoji(cat: EventCategory | str) -> str:
     code = cat.value if hasattr(cat, "value") else str(cat)
     mapping = {
         "EXHIBITION": "🖼",
-        "MASTERCLASS": "🧑‍🏫",
+        "MASTERCLASS": "🧑🏫",
         "CONCERT": "🎤",
         "PERFORMANCE": "🎭",
         "LECTURE": "🎓",
@@ -143,6 +154,7 @@ def fmt_when(e: Event) -> str:
 def fmt_price(e: Event) -> str:
     if e.price_admission is None:
         return "—"
+
     try:
         v = float(e.price_admission)
         s = str(int(v)) if v.is_integer() else str(v)
@@ -153,6 +165,20 @@ def fmt_price(e: Event) -> str:
     if e.category == EventCategory.CONCERT:
         return f"от {s} ₽"
     return f"{s} ₽"
+
+
+# ---------- photos helpers ----------
+async def fetch_event_photos(event_id: int) -> list[EventPhoto]:
+    async with get_db() as db:
+        rows = (
+            await db.execute(
+                select(EventPhoto)
+                .where(EventPhoto.event_id == event_id)
+                .order_by(EventPhoto.position.asc())
+                .limit(MAX_PHOTOS)
+            )
+        ).scalars().all()
+        return list(rows)
 
 
 # ---------- filtering ----------
@@ -170,7 +196,6 @@ def _event_overlaps_range_condition(date_from: date, date_to: date):
 
 async def fetch_events(city_slug: str, mode: str):
     today = date.today()
-
     where = [
         Event.city_slug == city_slug,
         Event.status == EventStatus.ACTIVE,
@@ -185,13 +210,11 @@ async def fetch_events(city_slug: str, mode: str):
     if mode == "today":
         where.append(_event_overlaps_range_condition(today, today))
         order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
-
     elif mode in ("3d", "7d", "30d"):
         days = int(mode.replace("d", ""))
         d2 = today + timedelta(days=days - 1)
         where.append(_event_overlaps_range_condition(today, d2))
         order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
-
     else:
         mode = "last"
         order_by = [desc(Event.created_at)]
@@ -209,47 +232,78 @@ async def fetch_events(city_slug: str, mode: str):
     return events, mode
 
 
-# ---------- inline details (in-place edit) ----------
+# ---------- keyboards ----------
 def event_preview_kb(event_id: int, can_expand: bool) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     if can_expand:
-        kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}")
+        kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}:1")
     kb.adjust(1)
     return kb.as_markup()
 
 
-def event_details_kb(event_id: int) -> InlineKeyboardMarkup:
+def event_details_kb(event_id: int, idx: int, total: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
+
+    if total > 1:
+        if idx > 1:
+            kb.button(text="◀︎", callback_data=f"res_event_open:{event_id}:{idx-1}")
+        kb.button(text=f"Фото {idx}/{total}", callback_data="noop")
+        if idx < total:
+            kb.button(text="▶︎", callback_data=f"res_event_open:{event_id}:{idx+1}")
+        kb.adjust(3)
+
     kb.button(text="⬅️ Назад", callback_data=f"res_event_close:{event_id}")
     kb.adjust(1)
     return kb.as_markup()
 
 
+# ---------- texts ----------
 def event_preview_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     return (
-        f"🎫 <b>{h(e.title)}</b>\n"
-        f"🏷 <b>{h(cat)}</b>\n"
+        f"🎫 {h(e.title)}\n"
+        f"🏷 {h(cat)}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"📅 <b>Когда:</b> {h(fmt_when(e))}\n"
-        f"📍 <b>Где:</b> {h(e.location)}\n"
-        f"💳 <b>Цена:</b> {h(fmt_price(e))}\n"
+        f"📅 Когда: {h(fmt_when(e))}\n"
+        f"📍 Где: {h(e.location)}\n"
+        f"💳 Цена: {h(fmt_price(e))}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"📝 <b>Описание:</b> {h(short(e.description))}"
+        f"📝 Описание: {h(short(e.description))}"
     )
 
 
 def event_details_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     return (
-        f"📄 <b>{h(e.title)}</b>\n"
-        f"🏷 <b>{h(cat)}</b>\n"
-        f"🏙 <b>{h(e.city_slug)}</b>\n\n"
-        f"📅 <b>Когда:</b> {h(fmt_when(e))}\n"
-        f"📍 <b>Где:</b> {h(e.location)}\n"
-        f"💳 <b>Цена:</b> {h(fmt_price(e))}\n\n"
-        f"📝 <b>Описание:</b>\n{h(compact(e.description) or '—')}"
+        f"📄 {h(e.title)}\n"
+        f"🏷 {h(cat)}\n"
+        f"🏙 {h(e.city_slug)}\n\n"
+        f"📅 Когда: {h(fmt_when(e))}\n"
+        f"📍 Где: {h(e.location)}\n"
+        f"💳 Цена: {h(fmt_price(e))}\n\n"
+        f"📝 Описание:\n{h(compact(e.description) or '—')}"
     )
+
+
+# ---------- sending ----------
+async def send_event_preview(message: Message, e: Event):
+    full_desc = compact(e.description)
+    can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
+
+    photos = await fetch_event_photos(e.id)
+    if photos:
+        await message.answer_photo(
+            photo=photos[0].file_id,
+            caption=event_preview_text(e),
+            parse_mode="HTML",
+            reply_markup=event_preview_kb(e.id, can_expand),
+        )
+    else:
+        await message.answer(
+            event_preview_text(e),
+            parse_mode="HTML",
+            reply_markup=event_preview_kb(e.id, can_expand),
+        )
 
 
 async def send_events_list(message: Message, city_slug: str, mode: str):
@@ -265,7 +319,7 @@ async def send_events_list(message: Message, city_slug: str, mode: str):
     events, mode = await fetch_events(city_slug, mode)
 
     await message.answer(
-        f"🏠 <b>События города: {h(city_name)}</b>\n"
+        f"🏠 События города: {h(city_name)}\n"
         f"{h(title_map.get(mode, title_map['last']))}\n"
         f"Показываю: {EVENTS_LIMIT_DEFAULT}",
         parse_mode="HTML",
@@ -276,13 +330,7 @@ async def send_events_list(message: Message, city_slug: str, mode: str):
         return
 
     for e in events:
-        full_desc = compact(e.description)
-        can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
-        await message.answer(
-            event_preview_text(e),
-            parse_mode="HTML",
-            reply_markup=event_preview_kb(e.id, can_expand),
-        )
+        await send_event_preview(message, e)
 
 
 # ---------- entry ----------
@@ -293,8 +341,8 @@ async def resident_entry(message: Message, state: FSMContext):
 
     default_city_name = CITIES.get(DEFAULT_CITY, {}).get("name", "Город не задан")
     await message.answer(
-        f"🏠 <b>Житель</b>\n\n"
-        f"🌍 По умолчанию: <b>{h(default_city_name)}</b>\n\n"
+        "🏠 Житель\n\n"
+        f"🌍 По умолчанию: {h(default_city_name)}\n\n"
         "👇 Выбери город:",
         reply_markup=resident_menu_kb(),
         parse_mode="HTML",
@@ -327,7 +375,7 @@ async def resident_city_select(callback: CallbackQuery, state: FSMContext):
 
     if status != "active":
         await callback.message.answer(
-            f"⏳ <b>{h(city_name)}</b> — раздел в разработке.\n\nВыбери другой город:",
+            f"⏳ {h(city_name)} — раздел в разработке.\n\nВыбери другой город:",
             parse_mode="HTML",
         )
         await callback.answer()
@@ -336,7 +384,7 @@ async def resident_city_select(callback: CallbackQuery, state: FSMContext):
     await state.set_state(ResidentState.browsing)
     await state.update_data(city_slug=slug, mode="last")
 
-    await callback.message.answer(f"✅ <b>{h(city_name)} выбран!</b>", parse_mode="HTML")
+    await callback.message.answer(f"✅ {h(city_name)} выбран!", parse_mode="HTML")
     await send_events_list(callback.message, slug, mode="last")
     await callback.answer()
 
@@ -358,19 +406,10 @@ async def resident_filters(message: Message, state: FSMContext):
         "🆕 Последние": "last",
     }
     mode = text_to_mode.get(message.text, "last")
-    await state.update_data(mode=mode)
 
+    await state.update_data(mode=mode)
     await send_events_list(message, city_slug, mode=mode)
 
-
-def main_menu_kb() -> ReplyKeyboardMarkup:
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="🏠 Житель"), KeyboardButton(text="🎪 Организатор")],
-            [KeyboardButton(text="🛡 Админ"), KeyboardButton(text="✍️ Обратная связь")],
-        ],
-        resize_keyboard=True,
-    )
 
 @router.message(F.text == "⬅️ Назад")
 async def resident_back(message: Message, state: FSMContext):
@@ -378,10 +417,13 @@ async def resident_back(message: Message, state: FSMContext):
     await message.answer("Главное меню:", reply_markup=main_menu_kb())
 
 
-# ---------- inline: open/close details in place ----------
+# ---------- inline: open/close details + gallery ----------
 @router.callback_query(F.data.startswith("res_event_open:"))
 async def resident_event_open(callback: CallbackQuery):
-    event_id = int(callback.data.split(":")[1])
+    # res_event_open:{event_id}:{idx}
+    parts = callback.data.split(":")
+    event_id = int(parts[1])
+    idx = int(parts[2]) if len(parts) >= 3 else 1
 
     async with get_db() as db:
         e = (await db.execute(select(Event).where(Event.id == event_id))).scalar_one_or_none()
@@ -390,11 +432,38 @@ async def resident_event_open(callback: CallbackQuery):
         await callback.answer("Событие не найдено", show_alert=True)
         return
 
-    await callback.message.edit_text(
-        event_details_text(e),
-        parse_mode="HTML",
-        reply_markup=event_details_kb(event_id),
-    )
+    photos = await fetch_event_photos(event_id)
+    total = len(photos)
+
+    if total <= 0:
+        # нет фото -> просто редактируем текст
+        await callback.message.edit_text(
+            event_details_text(e),
+            parse_mode="HTML",
+            reply_markup=event_details_kb(event_id, 1, 0),
+        )
+        await callback.answer()
+        return
+
+    idx = max(1, min(idx, total))
+    file_id = photos[idx - 1].file_id
+
+    try:
+        # меняем медиа (без "спама" новыми сообщениями)
+        await callback.message.edit_media(
+            media={"type": "photo", "media": file_id, "caption": event_details_text(e), "parse_mode": "HTML"},
+            reply_markup=event_details_kb(event_id, idx, total),
+        )
+    except Exception:
+        # если Telegram не дал edit_media (например, исходное сообщение было текстом),
+        # просто пришлём новое фото с деталями
+        await callback.message.answer_photo(
+            photo=file_id,
+            caption=event_details_text(e),
+            parse_mode="HTML",
+            reply_markup=event_details_kb(event_id, idx, total),
+        )
+
     await callback.answer()
 
 
@@ -412,9 +481,31 @@ async def resident_event_close(callback: CallbackQuery):
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
 
-    await callback.message.edit_text(
-        event_preview_text(e),
-        parse_mode="HTML",
-        reply_markup=event_preview_kb(event_id, can_expand),
-    )
+    photos = await fetch_event_photos(event_id)
+    if photos:
+        # вернёмся к preview с обложкой
+        try:
+            await callback.message.edit_media(
+                media={"type": "photo", "media": photos[0].file_id, "caption": event_preview_text(e), "parse_mode": "HTML"},
+                reply_markup=event_preview_kb(event_id, can_expand),
+            )
+        except Exception:
+            await callback.message.answer_photo(
+                photo=photos[0].file_id,
+                caption=event_preview_text(e),
+                parse_mode="HTML",
+                reply_markup=event_preview_kb(event_id, can_expand),
+            )
+    else:
+        await callback.message.edit_text(
+            event_preview_text(e),
+            parse_mode="HTML",
+            reply_markup=event_preview_kb(event_id, can_expand),
+        )
+
+    await callback.answer()
+
+
+@router.callback_query(F.data == "noop")
+async def noop(callback: CallbackQuery):
     await callback.answer()

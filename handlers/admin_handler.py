@@ -187,21 +187,44 @@ async def admin_approve(callback: CallbackQuery, state: FSMContext):
             await callback.answer("Заявка не найдена", show_alert=True)
             return
 
-        # Пока оплату “решим потом”: не меняем схему и не вводим новый статус.
-        # Просто считаем, что админ одобрил, и отправляем организатору кнопку оплаты.
-        if callback.message:
-            await callback.message.edit_text(
-                (callback.message.text or "") + "\n\n✅ <b>Одобрено.</b> Ожидаем оплату от организатора.",
-                parse_mode="HTML",
-                reply_markup=None,
-            )
+        # фиксируем статус (если ты используешь APPROVED_WAITING_PAYMENT — оставляем как есть в твоей модели)
+        if hasattr(EventStatus, "APPROVED_WAITING_PAYMENT"):
+            event.status = EventStatus.APPROVED_WAITING_PAYMENT
+        else:
+            # fallback если вдруг статуса нет
+            event.status = EventStatus.PENDING_MODERATION
 
-        await callback.bot.send_message(
-            event.user_id,
-            "✅ Одобрено.\n\nОплатите размещение, после оплаты мероприятие появится в ленте города.",
-            parse_mode="HTML",
-            reply_markup=pay_kb(event.id),
-        )
+    # 1) Обновляем сообщение модерации (поддержка text и photo(caption))
+    if callback.message:
+        suffix = "\n\n✅ Одобрено. Ожидаем оплату от организатора."
+        try:
+            if callback.message.photo:
+                # это photo message -> правим caption
+                current = callback.message.caption or ""
+                await callback.message.edit_caption(
+                    caption=current + suffix,
+                    parse_mode="HTML",
+                    reply_markup=None,
+                )
+            else:
+                # обычный текст
+                current = callback.message.text or ""
+                await callback.message.edit_text(
+                    current + suffix,
+                    parse_mode="HTML",
+                    reply_markup=None,
+                )
+        except Exception:
+            # если не получилось отредактировать (например, сообщение уже меняли) — просто отвечаем новым
+            await callback.message.answer("✅ Одобрено. Ожидаем оплату от организатора.", parse_mode="HTML")
+
+    # 2) Пишем организатору
+    await callback.bot.send_message(
+        event.user_id,
+        "✅ Одобрено.\n\nОплатите размещение, после оплаты мероприятие появится в ленте города.",
+        parse_mode="HTML",
+        reply_markup=pay_kb(event.id),
+    )
 
     await state.clear()
     await callback.answer("Одобрено")

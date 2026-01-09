@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum as PyEnum
 
+from sqlalchemy import UniqueConstraint
 from sqlalchemy import (
     Column,
     Integer,
@@ -68,15 +69,12 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
-
     username = Column(String(255), nullable=True)
     first_name = Column(String(255), nullable=True)
     last_name = Column(String(255), nullable=True)
     phone = Column(String(20), nullable=True)
-
     role = Column(SQLEnum(UserRole), default=UserRole.RESIDENT)
     city_slug = Column(String(50), default="nojabrsk")
-
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -94,7 +92,6 @@ class City(Base):
     slug = Column(String(50), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
     status = Column(SQLEnum(CityStatus), default=CityStatus.ACTIVE)
-
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -103,7 +100,6 @@ class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
     city_slug = Column(String(50), nullable=False)
 
@@ -124,6 +120,7 @@ class Event(Base):
     # visitor pricing (tiers / misc)
     admission_price_json = Column(Text, nullable=True)  # JSON str: {"дети":300,"взрослые":600}
     free_kids_upto_age = Column(Integer, nullable=True)
+
     reject_reason = Column(Text, nullable=True)
 
     # DAILY
@@ -157,13 +154,41 @@ class Event(Base):
     comments = relationship("Comment", back_populates="event")
     favorites = relationship("Favorite", back_populates="event")
 
+    # NEW: photos
+    photos = relationship(
+        "EventPhoto",
+        back_populates="event",
+        cascade="all, delete-orphan",
+        order_by="EventPhoto.position.asc()",
+    )
+
+
+# ---------- EventPhoto (NEW) ----------
+class EventPhoto(Base):
+    __tablename__ = "event_photos"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    event_id = Column(Integer, ForeignKey("events.id", ondelete="CASCADE"), nullable=False)
+
+    # Telegram file_id
+    file_id = Column(String(255), nullable=False)
+
+    # 1..5
+    position = Column(Integer, nullable=False, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    event = relationship("Event", back_populates="photos")
+
+    __table_args__ = (
+        UniqueConstraint("event_id", "position", name="uq_event_photos_event_pos"),
+    )
+
 
 # ---------- Payment ----------
 class Payment(Base):
     __tablename__ = "payments"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
 
     # Один платёж на одно событие (если захочешь историю платежей — убери unique=True)
@@ -229,6 +254,5 @@ class Feedback(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
-
     message = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
