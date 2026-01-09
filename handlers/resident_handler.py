@@ -274,15 +274,18 @@ def event_preview_text(e: Event) -> str:
 
 def event_details_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
+    city_name = CITIES.get(e.city_slug, {}).get("name", e.city_slug)
+
     return (
         f"📄 {h(e.title)}\n"
         f"🏷 {h(cat)}\n"
-        f"🏙 {h(e.city_slug)}\n\n"
+        f"🏙 {h(city_name)}\n\n"
         f"📅 Когда: {h(fmt_when(e))}\n"
         f"📍 Где: {h(e.location)}\n"
         f"💳 Цена: {h(fmt_price(e))}\n\n"
         f"📝 Описание:\n{h(compact(e.description) or '—')}"
     )
+
 
 
 # ---------- sending ----------
