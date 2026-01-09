@@ -2165,3 +2165,151 @@ aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: there
 2026-01-10 01:02:40,762 - aiogram.dispatcher - WARNING - Received SIGINT signal
 2026-01-10 01:02:40,766 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
 2026-01-10 01:02:40,766 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 01:33:16,749 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 01:33:16,751 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 01:33:17,103 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:33:27,972 - aiogram.event - INFO - Update id=605165693 is handled. Duration 559 ms by bot id=8341383973
+2026-01-10 01:33:31,973 - aiogram.event - INFO - Update id=605165694 is handled. Duration 2196 ms by bot id=8341383973
+2026-01-10 01:33:42,750 - aiogram.event - INFO - Update id=605165695 is handled. Duration 250 ms by bot id=8341383973
+2026-01-10 01:33:49,382 - aiogram.event - INFO - Update id=605165696 is handled. Duration 250 ms by bot id=8341383973
+2026-01-10 01:34:15,572 - aiogram.event - INFO - Update id=605165697 is handled. Duration 243 ms by bot id=8341383973
+2026-01-10 01:34:20,387 - aiogram.event - INFO - Update id=605165698 is handled. Duration 153 ms by bot id=8341383973
+2026-01-10 01:46:12,639 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 01:46:12,650 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:46:12,651 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 01:46:12,817 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 01:46:25,368 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 01:46:25,369 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 01:46:25,688 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:46:42,224 - aiogram.event - INFO - Update id=605165699 is handled. Duration 526 ms by bot id=8341383973
+2026-01-10 01:46:45,006 - aiogram.event - INFO - Update id=605165700 is handled. Duration 698 ms by bot id=8341383973
+2026-01-10 01:46:56,346 - aiogram.event - INFO - Update id=605165701 is handled. Duration 2012 ms by bot id=8341383973
+2026-01-10 01:47:07,038 - aiogram.event - INFO - Update id=605165702 is handled. Duration 250 ms by bot id=8341383973
+2026-01-10 01:47:10,393 - aiogram.event - INFO - Update id=605165703 is handled. Duration 391 ms by bot id=8341383973
+2026-01-10 01:47:16,457 - aiogram.event - INFO - Update id=605165704 is handled. Duration 266 ms by bot id=8341383973
+2026-01-10 01:47:18,772 - aiogram.event - INFO - Update id=605165705 is handled. Duration 283 ms by bot id=8341383973
+2026-01-10 01:50:33,568 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 01:50:33,570 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:50:33,571 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 01:50:41,028 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 01:50:41,028 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 01:50:41,348 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:50:50,333 - aiogram.event - INFO - Update id=605165706 is handled. Duration 348 ms by bot id=8341383973
+2026-01-10 01:50:51,988 - aiogram.event - INFO - Update id=605165707 is handled. Duration 242 ms by bot id=8341383973
+2026-01-10 01:50:59,752 - aiogram.event - INFO - Update id=605165708 is handled. Duration 325 ms by bot id=8341383973
+2026-01-10 01:51:08,305 - aiogram.event - INFO - Update id=605165709 is handled. Duration 118 ms by bot id=8341383973
+2026-01-10 01:51:14,430 - aiogram.event - INFO - Update id=605165710 is handled. Duration 1691 ms by bot id=8341383973
+2026-01-10 01:51:25,879 - aiogram.event - INFO - Update id=605165711 is handled. Duration 673 ms by bot id=8341383973
+2026-01-10 01:51:35,956 - aiogram.event - INFO - Update id=605165712 is handled. Duration 557 ms by bot id=8341383973
+2026-01-10 01:51:39,266 - aiogram.event - INFO - Update id=605165713 is handled. Duration 245 ms by bot id=8341383973
+2026-01-10 01:51:46,288 - aiogram.event - INFO - Update id=605165714 is handled. Duration 233 ms by bot id=8341383973
+2026-01-10 01:51:48,794 - aiogram.event - INFO - Update id=605165715 is handled. Duration 744 ms by bot id=8341383973
+2026-01-10 01:52:36,456 - aiogram.event - INFO - Update id=605165716 is handled. Duration 265 ms by bot id=8341383973
+2026-01-10 01:52:42,078 - aiogram.event - INFO - Update id=605165717 is handled. Duration 855 ms by bot id=8341383973
+2026-01-10 01:52:46,206 - aiogram.event - INFO - Update id=605165718 is handled. Duration 1276 ms by bot id=8341383973
+2026-01-10 01:52:50,981 - aiogram.event - INFO - Update id=605165719 is handled. Duration 119 ms by bot id=8341383973
+2026-01-10 01:52:54,447 - aiogram.event - INFO - Update id=605165720 is handled. Duration 348 ms by bot id=8341383973
+2026-01-10 01:52:57,722 - aiogram.event - INFO - Update id=605165721 is handled. Duration 1413 ms by bot id=8341383973
+2026-01-10 01:56:24,943 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 01:56:24,950 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:56:24,951 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 01:56:42,943 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 01:56:42,944 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 01:56:43,281 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 01:57:01,098 - aiogram.event - INFO - Update id=605165722 is handled. Duration 362 ms by bot id=8341383973
+2026-01-10 01:57:04,165 - aiogram.event - INFO - Update id=605165723 is handled. Duration 311 ms by bot id=8341383973
+2026-01-10 01:57:07,970 - aiogram.event - INFO - Update id=605165724 is handled. Duration 2254 ms by bot id=8341383973
+2026-01-10 01:57:12,186 - aiogram.event - INFO - Update id=605165725 is not handled. Duration 449 ms by bot id=8341383973
+2026-01-10 01:57:12,186 - aiogram.event - ERROR - Cause exception while process update id=605165725 by bot id=8341383973
+TelegramBadRequest: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/resident_handler.py", line 780, in resident_fav_toggle
+    await callback.message.edit_reply_markup(
+        reply_markup=event_preview_kb(event_id, can_expand, new_state)
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/methods/base.py", line 82, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/bot.py", line 484, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/session/base.py", line 259, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/session/aiohttp.py", line 177, in make_request
+    response = self.check_response(
+        bot=bot,
+    ...<2 lines>...
+        content=raw_result,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/session/base.py", line 121, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2026-01-10 01:57:13,648 - aiogram.event - INFO - Update id=605165726 is handled. Duration 257 ms by bot id=8341383973
+2026-01-10 01:57:15,810 - aiogram.event - INFO - Update id=605165727 is handled. Duration 266 ms by bot id=8341383973
+2026-01-10 01:57:19,087 - aiogram.event - INFO - Update id=605165728 is handled. Duration 161 ms by bot id=8341383973
+2026-01-10 01:57:23,740 - aiogram.event - INFO - Update id=605165729 is handled. Duration 280 ms by bot id=8341383973
+2026-01-10 01:57:26,038 - aiogram.event - INFO - Update id=605165730 is handled. Duration 359 ms by bot id=8341383973
+2026-01-10 01:57:27,751 - aiogram.event - INFO - Update id=605165731 is handled. Duration 306 ms by bot id=8341383973
+2026-01-10 01:57:30,611 - aiogram.event - INFO - Update id=605165732 is handled. Duration 465 ms by bot id=8341383973
+2026-01-10 01:57:34,338 - aiogram.event - INFO - Update id=605165733 is handled. Duration 266 ms by bot id=8341383973
+2026-01-10 01:57:40,993 - aiogram.event - INFO - Update id=605165734 is handled. Duration 156 ms by bot id=8341383973
+2026-01-10 01:57:45,759 - aiogram.event - INFO - Update id=605165735 is handled. Duration 741 ms by bot id=8341383973
+2026-01-10 01:57:47,466 - aiogram.event - INFO - Update id=605165736 is handled. Duration 696 ms by bot id=8341383973
