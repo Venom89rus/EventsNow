@@ -28,21 +28,21 @@ PRICING_CONFIG = {
         "model": "period",
         "base_price_per_day": 150,
         "packages": {
-            "1_day": 150,
-            "3_days": 400,
-            "7_days": 900,
-            "14_days": 1700,
-            "30_days": 3300,
+            "1_day": 199,
+            "3_days": 499,
+            "7_days": 999,
+            "14_days": 1699,
+            "30_days": 3299,
         }
     },
     "MASTERCLASS": {
         "name": "Мастер-класс",
         "model": "daily",
         "packages": {
-            "1_post": 99,
-            "3_posts": 249,
-            "5_posts": 399,
-            "10_posts": 749,
+            "1_post": 199,
+            "3_posts": 499,
+            "5_posts": 699,
+            "10_posts": 1099,
         }
     },
     "CONCERT": {
@@ -59,10 +59,11 @@ PRICING_CONFIG = {
         "name": "Выступление",
         "model": "daily",
         "packages": {
-            "1_post": 99,
-            "3_posts": 249,
-            "5_posts": 399,
-            "10_posts": 749,
+            "1_day": 199,
+            "3_days": 499,
+            "7_days": 999,
+            "14_days": 1699,
+            "30_days": 3299,
         }
     },
     "LECTURE": {
@@ -79,10 +80,11 @@ PRICING_CONFIG = {
         "name": "Другое",
         "model": "daily",
         "packages": {
-            "1_post": 99,
-            "3_posts": 249,
-            "5_posts": 399,
-            "10_posts": 749,
+            "1_day": 199,
+            "3_days": 499,
+            "7_days": 999,
+            "14_days": 1699,
+            "30_days": 3299,
         }
     }
 }
