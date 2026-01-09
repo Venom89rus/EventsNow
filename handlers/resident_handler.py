@@ -1,4 +1,5 @@
 import html
+import urllib.parse
 from datetime import date, timedelta
 
 from aiogram import Router, F
@@ -13,6 +14,8 @@ from aiogram.types import (
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.deep_linking import create_start_link
+
 from sqlalchemy import select, desc, and_, or_, func
 
 from config import CITIES, DEFAULT_CITY
@@ -49,6 +52,13 @@ def short(text: str | None, limit: int = DESC_PREVIEW_LEN) -> str:
     if not t:
         return "—"
     return t if len(t) <= limit else t[:limit].rstrip() + "…"
+
+
+# ---------- share helpers ----------
+async def build_share_url(bot, event_id: int, title: str | None = None) -> str:
+    deeplink = await create_start_link(bot, f"e{event_id}", encode=False)
+    text = "Смотри событие в EventsNow" if not title else f"Смотри: {title}"
+    return "https://t.me/share/url?" + urllib.parse.urlencode({"url": deeplink, "text": text})
 
 
 # ---------- favorites helpers ----------
@@ -281,6 +291,7 @@ async def fetch_favorite_event_ids(user_id: int, city_slug: str | None) -> list[
             )
             .order_by(desc(Favorite.added_at))
         )
+
         if city_slug:
             q = q.where(Event.city_slug == city_slug)
 
@@ -294,16 +305,18 @@ async def fetch_event(event_id: int) -> Event | None:
 
 
 # ---------- keyboards (events) ----------
-def event_preview_kb(event_id: int, can_expand: bool, fav: bool) -> InlineKeyboardMarkup:
+def event_preview_kb(event_id: int, can_expand: bool, fav: bool, share_url: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
 
     star_text = "✅ В избранном" if fav else "⭐ В избранное"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
+    kb.button(text="🔗 Поделиться", url=share_url)
 
     if can_expand:
         kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}:1")
 
-    kb.adjust(1)
+    # 2 кнопки в первой строке, дальше по 1
+    kb.adjust(2, 1)
     return kb.as_markup()
 
 
@@ -312,12 +325,14 @@ def event_details_kb(
     idx: int,
     total: int,
     fav: bool,
+    share_url: str,
     back_cb: str | None = None,
 ) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
 
     star_text = "✅ В избранном" if fav else "⭐ В избранное"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
+    kb.button(text="🔗 Поделиться", url=share_url)
 
     if total > 1:
         if idx > 1:
@@ -331,8 +346,7 @@ def event_details_kb(
         kb.button(text="↩️ В избранное", callback_data=back_cb)
 
     kb.button(text="⬅️ Назад", callback_data=f"res_event_close:{event_id}")
-    kb.adjust(1)
-
+    kb.adjust(2, 1)
     return kb.as_markup()
 
 
@@ -344,9 +358,9 @@ def favorites_carousel_kb(
     fav: bool,
     can_expand: bool,
     city_slug: str | None,
+    share_url: str,
 ) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-
     city_part = city_slug or "all"
 
     if total > 1:
@@ -357,13 +371,15 @@ def favorites_carousel_kb(
 
     star_text = "✅ В избранном" if fav else "⭐ В избранное"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
+    kb.button(text="🔗 Поделиться", url=share_url)
 
     if can_expand:
         kb.button(text="📄 Подробнее", callback_data=f"res_event_open_fav:{event_id}:1:{pos}:{city_part}")
 
     kb.button(text="✖️ Закрыть", callback_data="res_fav_close")
 
-    kb.adjust(1)
+    # star+share рядом; остальное по одной
+    kb.adjust(3, 2, 1, 1)
     return kb.as_markup()
 
 
@@ -402,6 +418,7 @@ async def send_event_preview(message: Message, e: Event):
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
 
     fav = await is_favorite(message.from_user.id, e.id)
+    share_url = await build_share_url(message.bot, e.id, title=e.title)
 
     photos = await fetch_event_photos(e.id)
     if photos:
@@ -409,13 +426,13 @@ async def send_event_preview(message: Message, e: Event):
             photo=photos[0].file_id,
             caption=event_preview_text(e),
             parse_mode="HTML",
-            reply_markup=event_preview_kb(e.id, can_expand, fav),
+            reply_markup=event_preview_kb(e.id, can_expand, fav, share_url),
         )
     else:
         await message.answer(
             event_preview_text(e),
             parse_mode="HTML",
-            reply_markup=event_preview_kb(e.id, can_expand, fav),
+            reply_markup=event_preview_kb(e.id, can_expand, fav, share_url),
         )
 
 
@@ -490,9 +507,11 @@ async def show_favorites_carousel(
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
 
+    share_url = await build_share_url(message.bot, e.id, title=e.title)
+
     photos = await fetch_event_photos(e.id)
     caption = f"{header}\n\n{event_preview_text(e)}"
-    kb = favorites_carousel_kb(pos, total, e.id, fav, can_expand, city_slug)
+    kb = favorites_carousel_kb(pos, total, e.id, fav, can_expand, city_slug, share_url)
 
     if photos:
         media = InputMediaPhoto(media=photos[0].file_id, caption=caption, parse_mode="HTML")
@@ -594,7 +613,7 @@ async def resident_filters(message: Message, state: FSMContext):
 @router.message(F.text == "⭐ Моё избранное")
 async def resident_favorites_entry(message: Message, state: FSMContext):
     data = await state.get_data()
-    city_slug = data.get("city_slug")  # если город не выбран — "все города"
+    city_slug = data.get("city_slug")
     await show_favorites_carousel(
         message=message,
         user_id=message.from_user.id,
@@ -613,7 +632,6 @@ async def resident_back(message: Message, state: FSMContext):
 # ---------- callbacks: favorites carousel ----------
 @router.callback_query(F.data.startswith("res_fav_car:"))
 async def resident_favorites_carousel_cb(callback: CallbackQuery):
-    # res_fav_car:{pos}:{city}
     parts = callback.data.split(":")
     pos = int(parts[1])
     city_part = parts[2] if len(parts) >= 3 else "all"
@@ -641,7 +659,6 @@ async def resident_favorites_close_cb(callback: CallbackQuery):
 # ---------- inline: open details from carousel (with back to carousel) ----------
 @router.callback_query(F.data.startswith("res_event_open_fav:"))
 async def resident_event_open_from_fav(callback: CallbackQuery):
-    # res_event_open_fav:{event_id}:{idx}:{pos}:{city}
     parts = callback.data.split(":")
     event_id = int(parts[1])
     idx = int(parts[2])
@@ -654,17 +671,17 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
         return
 
     fav = await is_favorite(callback.from_user.id, event_id)
-
     photos = await fetch_event_photos(event_id)
     total = len(photos)
-
     back_cb = f"res_fav_car:{pos}:{city_part}"
+
+    share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
     if total <= 0:
         await callback.message.edit_text(
             event_details_text(e),
             parse_mode="HTML",
-            reply_markup=event_details_kb(event_id, 1, 0, fav, back_cb=back_cb),
+            reply_markup=event_details_kb(event_id, 1, 0, fav, share_url, back_cb=back_cb),
         )
         await callback.answer()
         return
@@ -675,14 +692,14 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
-            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=back_cb),
+            reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=back_cb),
         )
     except Exception:
         await callback.message.answer_photo(
             photo=file_id,
             caption=event_details_text(e),
             parse_mode="HTML",
-            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=back_cb),
+            reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=back_cb),
         )
 
     await callback.answer()
@@ -691,7 +708,6 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
 # ---------- inline: open/close details + gallery (обычный режим) ----------
 @router.callback_query(F.data.startswith("res_event_open:"))
 async def resident_event_open(callback: CallbackQuery):
-    # res_event_open:{event_id}:{idx}
     parts = callback.data.split(":")
     event_id = int(parts[1])
     idx = int(parts[2]) if len(parts) >= 3 else 1
@@ -702,15 +718,16 @@ async def resident_event_open(callback: CallbackQuery):
         return
 
     fav = await is_favorite(callback.from_user.id, event_id)
-
     photos = await fetch_event_photos(event_id)
     total = len(photos)
+
+    share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
     if total <= 0:
         await callback.message.edit_text(
             event_details_text(e),
             parse_mode="HTML",
-            reply_markup=event_details_kb(event_id, 1, 0, fav, back_cb=None),
+            reply_markup=event_details_kb(event_id, 1, 0, fav, share_url, back_cb=None),
         )
         await callback.answer()
         return
@@ -721,14 +738,14 @@ async def resident_event_open(callback: CallbackQuery):
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
-            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=None),
+            reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=None),
         )
     except Exception:
         await callback.message.answer_photo(
             photo=file_id,
             caption=event_details_text(e),
             parse_mode="HTML",
-            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=None),
+            reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=None),
         )
 
     await callback.answer()
@@ -747,26 +764,27 @@ async def resident_event_close(callback: CallbackQuery):
 
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
+    share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
     photos = await fetch_event_photos(event_id)
     if photos:
         try:
             await callback.message.edit_media(
                 media=InputMediaPhoto(media=photos[0].file_id, caption=event_preview_text(e), parse_mode="HTML"),
-                reply_markup=event_preview_kb(event_id, can_expand, fav),
+                reply_markup=event_preview_kb(event_id, can_expand, fav, share_url),
             )
         except Exception:
             await callback.message.answer_photo(
                 photo=photos[0].file_id,
                 caption=event_preview_text(e),
                 parse_mode="HTML",
-                reply_markup=event_preview_kb(event_id, can_expand, fav),
+                reply_markup=event_preview_kb(event_id, can_expand, fav, share_url),
             )
     else:
         await callback.message.edit_text(
             event_preview_text(e),
             parse_mode="HTML",
-            reply_markup=event_preview_kb(event_id, can_expand, fav),
+            reply_markup=event_preview_kb(event_id, can_expand, fav, share_url),
         )
 
     await callback.answer()
@@ -785,7 +803,6 @@ async def resident_fav_toggle(callback: CallbackQuery):
     current = await is_favorite(callback.from_user.id, event_id)
     new_state = await set_favorite(callback.from_user.id, event_id, value=not current)
 
-    # Определяем режим: details или нет
     is_details = False
     idx = 1
     total = 0
@@ -809,6 +826,8 @@ async def resident_fav_toggle(callback: CallbackQuery):
                     has_back_to_fav = True
                     back_cb = btn.callback_data
 
+    share_url = await build_share_url(callback.bot, event_id, title=e.title)
+
     if is_details:
         if total <= 0:
             photos = await fetch_event_photos(event_id)
@@ -816,20 +835,26 @@ async def resident_fav_toggle(callback: CallbackQuery):
             idx = min(max(1, idx), max(1, total))
 
         await callback.message.edit_reply_markup(
-            reply_markup=event_details_kb(event_id, idx, total, new_state, back_cb=back_cb if has_back_to_fav else None)
+            reply_markup=event_details_kb(
+                event_id,
+                idx,
+                total,
+                new_state,
+                share_url,
+                back_cb=back_cb if has_back_to_fav else None,
+            )
         )
         await callback.answer("Добавлено" if new_state else "Убрано")
         return
 
-    # Не details => либо обычный preview, либо favorites-carousel
     text = (callback.message.text or "") if callback.message else ""
     caption = (callback.message.caption or "") if callback.message else ""
     is_fav_carousel = ("⭐ Моё избранное" in text) or ("⭐ Моё избранное" in caption)
 
     if is_fav_carousel:
-        # восстановим pos/city по callback_data стрелок
         pos = 0
         city_slug = None
+
         if callback.message and callback.message.reply_markup:
             for row in callback.message.reply_markup.inline_keyboard:
                 for btn in row:
@@ -838,7 +863,6 @@ async def resident_fav_toggle(callback: CallbackQuery):
                         if len(parts) >= 3:
                             city_part = parts[2]
                             city_slug = None if city_part == "all" else city_part
-                            # pos безопасно берём как min из левой/правой — но проще: не трогаем, show_favorites_carousel сам подрежет
                             try:
                                 pos = int(parts[1])
                             except Exception:
@@ -855,11 +879,10 @@ async def resident_fav_toggle(callback: CallbackQuery):
         await callback.answer("Добавлено" if new_state else "Убрано")
         return
 
-    # обычный preview в ленте
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
     await callback.message.edit_reply_markup(
-        reply_markup=event_preview_kb(event_id, can_expand, new_state)
+        reply_markup=event_preview_kb(event_id, can_expand, new_state, share_url)
     )
     await callback.answer("Добавлено" if new_state else "Убрано")
 
