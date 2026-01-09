@@ -30,13 +30,11 @@ DESC_PREVIEW_LEN = 100
 MAX_PHOTOS = 5
 
 
-# ---------- FSM ----------
 class ResidentState(StatesGroup):
     choosing_city = State()
     browsing = State()
 
 
-# ---------- basics ----------
 def h(x) -> str:
     return html.escape(str(x)) if x is not None else ""
 
@@ -54,14 +52,12 @@ def short(text: str | None, limit: int = DESC_PREVIEW_LEN) -> str:
     return t if len(t) <= limit else t[:limit].rstrip() + "…"
 
 
-# ---------- share helpers ----------
 async def build_share_url(bot, event_id: int, title: str | None = None) -> str:
     deeplink = await create_start_link(bot, f"e{event_id}", encode=False)
     text = "Смотри событие в EventsNow" if not title else f"Смотри: {title}"
     return "https://t.me/share/url?" + urllib.parse.urlencode({"url": deeplink, "text": text})
 
 
-# ---------- favorites helpers ----------
 async def is_favorite(user_id: int, event_id: int) -> bool:
     async with get_db() as db:
         fav = (
@@ -76,9 +72,6 @@ async def is_favorite(user_id: int, event_id: int) -> bool:
 
 
 async def set_favorite(user_id: int, event_id: int, value: bool) -> bool:
-    """
-    Возвращает фактическое состояние после операции (True если в избранном).
-    """
     async with get_db() as db:
         fav = (
             await db.execute(
@@ -100,13 +93,12 @@ async def set_favorite(user_id: int, event_id: int, value: bool) -> bool:
         return False
 
 
-# ---------- reply keyboard ----------
 def resident_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🕘 Сегодня"), KeyboardButton(text="📆 3 дня"), KeyboardButton(text="📅 Неделя")],
             [KeyboardButton(text="🗓 Месяц"), KeyboardButton(text="🆕 Последние"), KeyboardButton(text="⭐ Моё избранное")],
-            [KeyboardButton(text="⬅️ Назад")],
+            [KeyboardButton(text="🗂 Архив"), KeyboardButton(text="⬅️ Назад")],
         ],
         resize_keyboard=True,
     )
@@ -122,7 +114,6 @@ def main_menu_kb() -> ReplyKeyboardMarkup:
     )
 
 
-# ---------- cities inline keyboard ----------
 def _cities_sorted():
     return sorted(CITIES.items(), key=lambda x: x[1]["name"])
 
@@ -157,7 +148,6 @@ def cities_keyboard(page: int = 0) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# ---------- formatting ----------
 def category_ru(cat: EventCategory | str) -> str:
     code = cat.value if hasattr(cat, "value") else str(cat)
     mapping = {
@@ -190,33 +180,28 @@ def fmt_when(e: Event) -> str:
         ts = e.event_time_start.strftime("%H:%M") if e.event_time_start else "—"
         te = e.event_time_end.strftime("%H:%M") if e.event_time_end else "—"
         return f"{ds} • {ts}-{te}"
-
     if e.period_start and e.period_end:
         ps = e.period_start.strftime("%d.%m.%Y")
         pe = e.period_end.strftime("%d.%m.%Y")
         ts = e.working_hours_start.strftime("%H:%M") if e.working_hours_start else "—"
         te = e.working_hours_end.strftime("%H:%M") if e.working_hours_end else "—"
         return f"{ps}-{pe} • {ts}-{te}"
-
     return "—"
 
 
 def fmt_price(e: Event) -> str:
     if e.price_admission is None:
         return "—"
-
     try:
         v = float(e.price_admission)
         s = str(int(v)) if v.is_integer() else str(v)
     except Exception:
         s = str(e.price_admission)
-
     if e.category == EventCategory.CONCERT:
         return f"от {s} ₽"
     return f"{s} ₽"
 
 
-# ---------- photos helpers ----------
 async def fetch_event_photos(event_id: int) -> list[EventPhoto]:
     async with get_db() as db:
         rows = (
@@ -230,7 +215,6 @@ async def fetch_event_photos(event_id: int) -> list[EventPhoto]:
         return list(rows)
 
 
-# ---------- filtering ----------
 def _event_overlaps_range_condition(date_from: date, date_to: date):
     return or_(
         and_(Event.event_date.is_not(None), Event.event_date >= date_from, Event.event_date <= date_to),
@@ -243,28 +227,47 @@ def _event_overlaps_range_condition(date_from: date, date_to: date):
     )
 
 
+def _event_is_upcoming_or_ongoing_condition(today: date):
+    """
+    Актуально = либо event_date >= today, либо период (period_end >= today).
+    """
+    return or_(
+        and_(Event.event_date.is_not(None), Event.event_date >= today),
+        and_(Event.period_end.is_not(None), Event.period_end >= today),
+    )
+
+
 async def fetch_events(city_slug: str, mode: str):
     today = date.today()
 
-    where = [
-        Event.city_slug == city_slug,
-        Event.status == EventStatus.ACTIVE,
-    ]
-
     start_dt = func.coalesce(Event.event_date, Event.period_start)
-    order_by = [desc(Event.created_at)]
 
-    if mode == "today":
-        where.append(_event_overlaps_range_condition(today, today))
-        order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
-    elif mode in ("3d", "7d", "30d"):
-        days = int(mode.replace("d", ""))
-        d2 = today + timedelta(days=days - 1)
-        where.append(_event_overlaps_range_condition(today, d2))
-        order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
+    if mode == "archive":
+        where = [
+            Event.city_slug == city_slug,
+            Event.status == EventStatus.ARCHIVED,
+        ]
+        order_by = [start_dt.desc().nullslast(), desc(Event.created_at)]
     else:
-        mode = "last"
-        order_by = [desc(Event.created_at)]
+        # Везде кроме архива показываем только ACTIVE + актуальные
+        where = [
+            Event.city_slug == city_slug,
+            Event.status == EventStatus.ACTIVE,
+        ]
+
+        if mode == "today":
+            where.append(_event_overlaps_range_condition(today, today))
+            order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
+        elif mode in ("3d", "7d", "30d"):
+            days = int(mode.replace("d", ""))
+            d2 = today + timedelta(days=days - 1)
+            where.append(_event_overlaps_range_condition(today, d2))
+            order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
+        else:
+            # "last" => только актуальные, но сортировка по created_at
+            mode = "last"
+            where.append(_event_is_upcoming_or_ongoing_condition(today))
+            order_by = [desc(Event.created_at)]
 
     async with get_db() as db:
         events = (
@@ -275,26 +278,22 @@ async def fetch_events(city_slug: str, mode: str):
                 .limit(EVENTS_LIMIT_DEFAULT)
             )
         ).scalars().all()
+        return events, mode
 
-    return events, mode
 
-
-# ---------- favorites: stable ordered ids ----------
-async def fetch_favorite_event_ids(user_id: int, city_slug: str | None) -> list[int]:
+async def fetch_favorite_event_ids(user_id: int, city_slug: str | None = None) -> list[int]:
     async with get_db() as db:
         q = (
             select(Favorite.event_id)
             .join(Event, Event.id == Favorite.event_id)
             .where(
                 Favorite.user_id == user_id,
-                Event.status == EventStatus.ACTIVE,
+                Event.status == EventStatus.ACTIVE,  # избранное = только актуальные
             )
             .order_by(desc(Favorite.added_at))
         )
-
         if city_slug:
             q = q.where(Event.city_slug == city_slug)
-
         ids = (await db.execute(q)).scalars().all()
         return list(ids)
 
@@ -304,53 +303,38 @@ async def fetch_event(event_id: int) -> Event | None:
         return (await db.execute(select(Event).where(Event.id == event_id))).scalar_one_or_none()
 
 
-# ---------- keyboards (events) ----------
 def event_preview_kb(event_id: int, can_expand: bool, fav: bool, share_url: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-
-    star_text = "✅ В избранном" if fav else "⭐ В избранное"
+    star_text = "⭐ В избранное" if not fav else "✅ В избранном"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
     kb.button(text="🔗 Поделиться", url=share_url)
-
     if can_expand:
-        kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}:1")
-
-    # 2 кнопки в первой строке, дальше по 1
+        kb.button(text="🔎 Подробнее", callback_data=f"res_event_open:{event_id}:1")
     kb.adjust(2, 1)
     return kb.as_markup()
 
 
-def event_details_kb(
-    event_id: int,
-    idx: int,
-    total: int,
-    fav: bool,
-    share_url: str,
-    back_cb: str | None = None,
-) -> InlineKeyboardMarkup:
+def event_details_kb(event_id: int, idx: int, total: int, fav: bool, share_url: str, back_cb: str | None = None) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-
-    star_text = "✅ В избранном" if fav else "⭐ В избранное"
+    star_text = "⭐ В избранное" if not fav else "✅ В избранном"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
     kb.button(text="🔗 Поделиться", url=share_url)
 
     if total > 1:
         if idx > 1:
-            kb.button(text="◀︎", callback_data=f"res_event_open:{event_id}:{idx-1}")
+            kb.button(text="⬅️", callback_data=f"res_event_open:{event_id}:{idx-1}")
         kb.button(text=f"Фото {idx}/{total}", callback_data="noop")
         if idx < total:
-            kb.button(text="▶︎", callback_data=f"res_event_open:{event_id}:{idx+1}")
+            kb.button(text="➡️", callback_data=f"res_event_open:{event_id}:{idx+1}")
         kb.adjust(3)
 
     if back_cb:
         kb.button(text="↩️ В избранное", callback_data=back_cb)
-
-    kb.button(text="⬅️ Назад", callback_data=f"res_event_close:{event_id}")
+    kb.button(text="❌ Закрыть", callback_data=f"res_event_close:{event_id}")
     kb.adjust(2, 1)
     return kb.as_markup()
 
 
-# ---------- keyboards (favorites carousel) ----------
 def favorites_carousel_kb(
     pos: int,
     total: int,
@@ -364,37 +348,30 @@ def favorites_carousel_kb(
     city_part = city_slug or "all"
 
     if total > 1:
-        kb.button(text="◀︎", callback_data=f"res_fav_car:{max(0, pos-1)}:{city_part}")
+        kb.button(text="⬅️", callback_data=f"res_fav_car:{max(0, pos-1)}:{city_part}")
         kb.button(text=f"{pos+1}/{total}", callback_data="noop")
-        kb.button(text="▶︎", callback_data=f"res_fav_car:{min(total-1, pos+1)}:{city_part}")
+        kb.button(text="➡️", callback_data=f"res_fav_car:{min(total-1, pos+1)}:{city_part}")
         kb.adjust(3)
 
-    star_text = "✅ В избранном" if fav else "⭐ В избранное"
+    star_text = "✅ В избранном"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
     kb.button(text="🔗 Поделиться", url=share_url)
-
     if can_expand:
-        kb.button(text="📄 Подробнее", callback_data=f"res_event_open_fav:{event_id}:1:{pos}:{city_part}")
-
-    kb.button(text="✖️ Закрыть", callback_data="res_fav_close")
-
-    # star+share рядом; остальное по одной
-    kb.adjust(3, 2, 1, 1)
+        kb.button(text="🔎 Подробнее", callback_data=f"res_event_open_fav:{event_id}:1:{pos}:{city_part}")
+    kb.button(text="❌ Закрыть", callback_data="res_fav_close")
+    kb.adjust(2, 1, 1)
     return kb.as_markup()
 
 
-# ---------- texts ----------
 def event_preview_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     return (
-        f"🎫 {h(e.title)}\n"
-        f"🏷 {h(cat)}\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"📅 Когда: {h(fmt_when(e))}\n"
-        f"📍 Где: {h(e.location)}\n"
-        f"💳 Цена: {h(fmt_price(e))}\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"📝 Описание: {h(short(e.description))}"
+        f"<b>{h(e.title)}</b>\n"
+        f"{h(cat)}\n\n"
+        f"<b>Когда:</b> {h(fmt_when(e))}\n"
+        f"<b>Где:</b> {h(e.location)}\n"
+        f"<b>Цена:</b> {h(fmt_price(e))}\n\n"
+        f"{h(short(e.description))}"
     )
 
 
@@ -402,21 +379,19 @@ def event_details_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     city_name = CITIES.get(e.city_slug, {}).get("name", e.city_slug)
     return (
-        f"📄 {h(e.title)}\n"
-        f"🏷 {h(cat)}\n"
-        f"🏙 {h(city_name)}\n\n"
-        f"📅 Когда: {h(fmt_when(e))}\n"
-        f"📍 Где: {h(e.location)}\n"
-        f"💳 Цена: {h(fmt_price(e))}\n\n"
-        f"📝 Описание:\n{h(compact(e.description) or '—')}"
+        f"<b>{h(e.title)}</b>\n"
+        f"{h(cat)}\n"
+        f"<b>{h(city_name)}</b>\n\n"
+        f"<b>Когда:</b> {h(fmt_when(e))}\n"
+        f"<b>Где:</b> {h(e.location)}\n"
+        f"<b>Цена:</b> {h(fmt_price(e))}\n\n"
+        f"{h(compact(e.description) or '—')}"
     )
 
 
-# ---------- sending (обычная лента) ----------
 async def send_event_preview(message: Message, e: Event):
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
-
     fav = await is_favorite(message.from_user.id, e.id)
     share_url = await build_share_url(message.bot, e.id, title=e.title)
 
@@ -438,32 +413,30 @@ async def send_event_preview(message: Message, e: Event):
 
 async def send_events_list(message: Message, city_slug: str, mode: str):
     city_name = CITIES.get(city_slug, {}).get("name", city_slug)
+
     title_map = {
-        "last": "🆕 Последние мероприятия",
-        "today": "🕘 Мероприятия на сегодня",
-        "3d": "📆 Мероприятия на 3 дня",
-        "7d": "📅 Мероприятия на неделю",
+        "last": "🆕 Последние (актуальные)",
+        "today": "🕘 Сегодня",
+        "3d": "📆 3 дня",
+        "7d": "📅 Неделя",
         "30d": "🗓 Месяц",
+        "archive": "🗂 Архив",
     }
 
     events, mode = await fetch_events(city_slug, mode)
-
     await message.answer(
-        f"🏠 События города: {h(city_name)}\n"
-        f"{h(title_map.get(mode, title_map['last']))}\n"
-        f"Показываю: {EVENTS_LIMIT_DEFAULT}",
+        f"<b>{h(city_name)}</b>\n{h(title_map.get(mode, mode))}\nПоказано: {len(events)} (лимит {EVENTS_LIMIT_DEFAULT})",
         parse_mode="HTML",
     )
 
     if not events:
-        await message.answer("Пока ничего не найдено по этому фильтру.", parse_mode="HTML")
+        await message.answer("Пока нет событий по выбранному фильтру.", parse_mode="HTML")
         return
 
     for e in events:
         await send_event_preview(message, e)
 
 
-# ---------- sending (favorites carousel) ----------
 async def show_favorites_carousel(
     message: Message,
     user_id: int,
@@ -478,7 +451,7 @@ async def show_favorites_carousel(
     header = f"⭐ Моё избранное • {h(city_title)}"
 
     if total == 0:
-        text = f"{header}\n\nПока избранного нет. Добавляй ⭐ из карточек событий."
+        text = f"{header}\n\nПока пусто."
         if edit_message:
             try:
                 await edit_message.edit_text(text, parse_mode="HTML", reply_markup=None)
@@ -490,8 +463,8 @@ async def show_favorites_carousel(
 
     pos = max(0, min(pos, total - 1))
     event_id = ids[pos]
-
     e = await fetch_event(event_id)
+
     if not e or e.status != EventStatus.ACTIVE:
         text = f"{header}\n\nСобытие недоступно."
         if edit_message:
@@ -503,25 +476,23 @@ async def show_favorites_carousel(
             await message.answer(text, parse_mode="HTML")
         return
 
-    fav = True
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
-
     share_url = await build_share_url(message.bot, e.id, title=e.title)
 
-    photos = await fetch_event_photos(e.id)
     caption = f"{header}\n\n{event_preview_text(e)}"
-    kb = favorites_carousel_kb(pos, total, e.id, fav, can_expand, city_slug, share_url)
+    kb = favorites_carousel_kb(pos, total, e.id, True, can_expand, city_slug, share_url)
 
+    photos = await fetch_event_photos(e.id)
     if photos:
         media = InputMediaPhoto(media=photos[0].file_id, caption=caption, parse_mode="HTML")
         if edit_message:
             try:
                 await edit_message.edit_media(media=media, reply_markup=kb)
             except Exception:
-                await message.answer_photo(photo=photos[0].file_id, caption=caption, parse_mode="HTML", reply_markup=kb)
+                await message.answer_photo(photos[0].file_id, caption=caption, parse_mode="HTML", reply_markup=kb)
         else:
-            await message.answer_photo(photo=photos[0].file_id, caption=caption, parse_mode="HTML", reply_markup=kb)
+            await message.answer_photo(photos[0].file_id, caption=caption, parse_mode="HTML", reply_markup=kb)
     else:
         if edit_message:
             try:
@@ -532,25 +503,18 @@ async def show_favorites_carousel(
             await message.answer(caption, parse_mode="HTML", reply_markup=kb)
 
 
-# ---------- entry ----------
 @router.message(F.text == "🏠 Житель")
 async def resident_entry(message: Message, state: FSMContext):
     await state.clear()
     await state.set_state(ResidentState.choosing_city)
 
-    default_city_name = CITIES.get(DEFAULT_CITY, {}).get("name", "Город не задан")
-    await message.answer(
-        "🏠 Житель\n\n"
-        f"🌍 По умолчанию: {h(default_city_name)}\n\n"
-        "👇 Выбери город:",
-        reply_markup=resident_menu_kb(),
-        parse_mode="HTML",
-    )
-    await message.answer("Список городов:", reply_markup=cities_keyboard(page=0), parse_mode="HTML")
+    default_city_name = CITIES.get(DEFAULT_CITY, {}).get("name", DEFAULT_CITY)
+    await message.answer(f"Город по умолчанию: <b>{h(default_city_name)}</b>", reply_markup=resident_menu_kb(), parse_mode="HTML")
+    await message.answer("Выбери город:", reply_markup=cities_keyboard(page=0), parse_mode="HTML")
 
 
 @router.callback_query(F.data.startswith("res_page:"))
-async def resident_page(callback: CallbackQuery):
+async def resident_page_cb(callback: CallbackQuery):
     page = int(callback.data.split(":")[1])
     await callback.message.edit_reply_markup(reply_markup=cities_keyboard(page=page))
     await callback.answer()
@@ -565,7 +529,7 @@ async def resident_city_select(callback: CallbackQuery, state: FSMContext):
         return
 
     city_name = info["name"]
-    status = info.get("status", "coming_soon")
+    status = info.get("status", "comingsoon")
 
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
@@ -573,23 +537,19 @@ async def resident_city_select(callback: CallbackQuery, state: FSMContext):
         pass
 
     if status != "active":
-        await callback.message.answer(
-            f"⏳ {h(city_name)} — раздел в разработке.\n\nВыбери другой город:",
-            parse_mode="HTML",
-        )
+        await callback.message.answer(f"<b>{h(city_name)}</b>\nГород пока недоступен.", parse_mode="HTML")
         await callback.answer()
         return
 
     await state.set_state(ResidentState.browsing)
     await state.update_data(city_slug=slug, mode="last")
 
-    await callback.message.answer(f"✅ {h(city_name)} выбран!", parse_mode="HTML")
-    await send_events_list(callback.message, slug, mode="last")
+    await callback.message.answer(f"<b>{h(city_name)}</b> выбран!", parse_mode="HTML")
+    await send_events_list(callback.message, slug, "last")
     await callback.answer()
 
 
-# ---------- resident menu filters ----------
-@router.message(F.text.in_({"🕘 Сегодня", "📆 3 дня", "📅 Неделя", "🗓 Месяц", "🆕 Последние"}))
+@router.message(F.text.in_({"🕘 Сегодня", "📆 3 дня", "📅 Неделя", "🗓 Месяц", "🆕 Последние", "🗂 Архив"}))
 async def resident_filters(message: Message, state: FSMContext):
     data = await state.get_data()
     city_slug = data.get("city_slug")
@@ -603,24 +563,19 @@ async def resident_filters(message: Message, state: FSMContext):
         "📅 Неделя": "7d",
         "🗓 Месяц": "30d",
         "🆕 Последние": "last",
+        "🗂 Архив": "archive",
     }
     mode = text_to_mode.get(message.text, "last")
 
     await state.update_data(mode=mode)
-    await send_events_list(message, city_slug, mode=mode)
+    await send_events_list(message, city_slug, mode)
 
 
 @router.message(F.text == "⭐ Моё избранное")
 async def resident_favorites_entry(message: Message, state: FSMContext):
     data = await state.get_data()
     city_slug = data.get("city_slug")
-    await show_favorites_carousel(
-        message=message,
-        user_id=message.from_user.id,
-        city_slug=city_slug,
-        pos=0,
-        edit_message=None,
-    )
+    await show_favorites_carousel(message=message, user_id=message.from_user.id, city_slug=city_slug, pos=0, edit_message=None)
 
 
 @router.message(F.text == "⬅️ Назад")
@@ -629,7 +584,6 @@ async def resident_back(message: Message, state: FSMContext):
     await message.answer("Главное меню:", reply_markup=main_menu_kb())
 
 
-# ---------- callbacks: favorites carousel ----------
 @router.callback_query(F.data.startswith("res_fav_car:"))
 async def resident_favorites_carousel_cb(callback: CallbackQuery):
     parts = callback.data.split(":")
@@ -656,7 +610,6 @@ async def resident_favorites_close_cb(callback: CallbackQuery):
     await callback.answer()
 
 
-# ---------- inline: open details from carousel (with back to carousel) ----------
 @router.callback_query(F.data.startswith("res_event_open_fav:"))
 async def resident_event_open_from_fav(callback: CallbackQuery):
     parts = callback.data.split(":")
@@ -667,17 +620,16 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
 
     e = await fetch_event(event_id)
     if not e or e.status != EventStatus.ACTIVE:
-        await callback.answer("Событие не найдено", show_alert=True)
+        await callback.answer("Событие недоступно", show_alert=True)
         return
 
     fav = await is_favorite(callback.from_user.id, event_id)
     photos = await fetch_event_photos(event_id)
     total = len(photos)
     back_cb = f"res_fav_car:{pos}:{city_part}"
-
     share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
-    if total <= 0:
+    if total == 0:
         await callback.message.edit_text(
             event_details_text(e),
             parse_mode="HTML",
@@ -688,7 +640,6 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
 
     idx = max(1, min(idx, total))
     file_id = photos[idx - 1].file_id
-
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
@@ -701,11 +652,9 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
             parse_mode="HTML",
             reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=back_cb),
         )
-
     await callback.answer()
 
 
-# ---------- inline: open/close details + gallery (обычный режим) ----------
 @router.callback_query(F.data.startswith("res_event_open:"))
 async def resident_event_open(callback: CallbackQuery):
     parts = callback.data.split(":")
@@ -714,16 +663,15 @@ async def resident_event_open(callback: CallbackQuery):
 
     e = await fetch_event(event_id)
     if not e or e.status != EventStatus.ACTIVE:
-        await callback.answer("Событие не найдено", show_alert=True)
+        await callback.answer("Событие недоступно", show_alert=True)
         return
 
     fav = await is_favorite(callback.from_user.id, event_id)
     photos = await fetch_event_photos(event_id)
     total = len(photos)
-
     share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
-    if total <= 0:
+    if total == 0:
         await callback.message.edit_text(
             event_details_text(e),
             parse_mode="HTML",
@@ -734,7 +682,6 @@ async def resident_event_open(callback: CallbackQuery):
 
     idx = max(1, min(idx, total))
     file_id = photos[idx - 1].file_id
-
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
@@ -747,7 +694,6 @@ async def resident_event_open(callback: CallbackQuery):
             parse_mode="HTML",
             reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=None),
         )
-
     await callback.answer()
 
 
@@ -757,11 +703,10 @@ async def resident_event_close(callback: CallbackQuery):
 
     e = await fetch_event(event_id)
     if not e or e.status != EventStatus.ACTIVE:
-        await callback.answer("Событие не найдено", show_alert=True)
+        await callback.answer("Событие недоступно", show_alert=True)
         return
 
     fav = await is_favorite(callback.from_user.id, event_id)
-
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
     share_url = await build_share_url(callback.bot, event_id, title=e.title)
@@ -790,14 +735,13 @@ async def resident_event_close(callback: CallbackQuery):
     await callback.answer()
 
 
-# ---------- favorite toggle ----------
 @router.callback_query(F.data.startswith("res_fav_toggle:"))
 async def resident_fav_toggle(callback: CallbackQuery):
     event_id = int(callback.data.split(":")[1])
 
     e = await fetch_event(event_id)
     if not e or e.status != EventStatus.ACTIVE:
-        await callback.answer("Событие не найдено", show_alert=True)
+        await callback.answer("Событие недоступно", show_alert=True)
         return
 
     current = await is_favorite(callback.from_user.id, event_id)
@@ -832,16 +776,10 @@ async def resident_fav_toggle(callback: CallbackQuery):
         if total <= 0:
             photos = await fetch_event_photos(event_id)
             total = len(photos)
-            idx = min(max(1, idx), max(1, total))
-
+        idx = min(max(1, idx), max(1, total))
         await callback.message.edit_reply_markup(
             reply_markup=event_details_kb(
-                event_id,
-                idx,
-                total,
-                new_state,
-                share_url,
-                back_cb=back_cb if has_back_to_fav else None,
+                event_id, idx, total, new_state, share_url, back_cb=back_cb if has_back_to_fav else None
             )
         )
         await callback.answer("Добавлено" if new_state else "Убрано")
@@ -854,7 +792,6 @@ async def resident_fav_toggle(callback: CallbackQuery):
     if is_fav_carousel:
         pos = 0
         city_slug = None
-
         if callback.message and callback.message.reply_markup:
             for row in callback.message.reply_markup.inline_keyboard:
                 for btn in row:
@@ -863,11 +800,11 @@ async def resident_fav_toggle(callback: CallbackQuery):
                         if len(parts) >= 3:
                             city_part = parts[2]
                             city_slug = None if city_part == "all" else city_part
-                            try:
-                                pos = int(parts[1])
-                            except Exception:
-                                pass
-                            break
+                        try:
+                            pos = int(parts[1])
+                        except Exception:
+                            pass
+                        break
 
         await show_favorites_carousel(
             message=callback.message,
@@ -881,6 +818,7 @@ async def resident_fav_toggle(callback: CallbackQuery):
 
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
+
     await callback.message.edit_reply_markup(
         reply_markup=event_preview_kb(event_id, can_expand, new_state, share_url)
     )

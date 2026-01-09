@@ -2359,3 +2359,21 @@ aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: messa
 2026-01-10 02:44:33,982 - aiogram.event - INFO - Update id=605165754 is handled. Duration 255 ms by bot id=8341383973
 2026-01-10 02:44:39,419 - aiogram.event - INFO - Update id=605165755 is handled. Duration 2129 ms by bot id=8341383973
 2026-01-10 02:45:33,540 - aiogram.event - INFO - Update id=605165756 is handled. Duration 136 ms by bot id=8341383973
+2026-01-10 03:11:44,433 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 03:11:44,469 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 03:11:44,471 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 03:11:44,601 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 03:11:51,418 - eventsnow - INFO - 🗂 Archived expired events: 1
+2026-01-10 03:11:51,467 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 03:11:51,467 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 03:11:51,798 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 03:12:54,388 - aiogram.event - INFO - Update id=605165757 is handled. Duration 338 ms by bot id=8341383973
+2026-01-10 03:12:57,141 - aiogram.event - INFO - Update id=605165758 is handled. Duration 246 ms by bot id=8341383973
+2026-01-10 03:13:04,171 - aiogram.event - INFO - Update id=605165759 is handled. Duration 2120 ms by bot id=8341383973
+2026-01-10 03:13:05,981 - aiogram.event - INFO - Update id=605165760 is handled. Duration 588 ms by bot id=8341383973
+2026-01-10 03:13:12,037 - aiogram.event - INFO - Update id=605165761 is handled. Duration 295 ms by bot id=8341383973
+2026-01-10 03:13:26,392 - aiogram.event - INFO - Update id=605165762 is handled. Duration 134 ms by bot id=8341383973
+2026-01-10 03:13:28,883 - aiogram.event - INFO - Update id=605165763 is handled. Duration 567 ms by bot id=8341383973
+2026-01-10 03:13:31,500 - aiogram.event - INFO - Update id=605165764 is handled. Duration 707 ms by bot id=8341383973
+2026-01-10 03:13:34,184 - aiogram.event - INFO - Update id=605165765 is handled. Duration 250 ms by bot id=8341383973
+2026-01-10 03:13:37,828 - aiogram.event - INFO - Update id=605165766 is handled. Duration 150 ms by bot id=8341383973
