@@ -269,7 +269,7 @@ async def fetch_events(city_slug: str, mode: str):
     return events, mode
 
 
-# ---------- favorites: fetch ids in stable order ----------
+# ---------- favorites: stable ordered ids ----------
 async def fetch_favorite_event_ids(user_id: int, city_slug: str | None) -> list[int]:
     async with get_db() as db:
         q = (
@@ -307,7 +307,13 @@ def event_preview_kb(event_id: int, can_expand: bool, fav: bool) -> InlineKeyboa
     return kb.as_markup()
 
 
-def event_details_kb(event_id: int, idx: int, total: int, fav: bool) -> InlineKeyboardMarkup:
+def event_details_kb(
+    event_id: int,
+    idx: int,
+    total: int,
+    fav: bool,
+    back_cb: str | None = None,
+) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
 
     star_text = "✅ В избранном" if fav else "⭐ В избранное"
@@ -321,6 +327,9 @@ def event_details_kb(event_id: int, idx: int, total: int, fav: bool) -> InlineKe
             kb.button(text="▶︎", callback_data=f"res_event_open:{event_id}:{idx+1}")
         kb.adjust(3)
 
+    if back_cb:
+        kb.button(text="↩️ В избранное", callback_data=back_cb)
+
     kb.button(text="⬅️ Назад", callback_data=f"res_event_close:{event_id}")
     kb.adjust(1)
 
@@ -328,7 +337,14 @@ def event_details_kb(event_id: int, idx: int, total: int, fav: bool) -> InlineKe
 
 
 # ---------- keyboards (favorites carousel) ----------
-def favorites_carousel_kb(pos: int, total: int, event_id: int, fav: bool, can_expand: bool, city_slug: str | None) -> InlineKeyboardMarkup:
+def favorites_carousel_kb(
+    pos: int,
+    total: int,
+    event_id: int,
+    fav: bool,
+    can_expand: bool,
+    city_slug: str | None,
+) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
 
     city_part = city_slug or "all"
@@ -343,7 +359,7 @@ def favorites_carousel_kb(pos: int, total: int, event_id: int, fav: bool, can_ex
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
 
     if can_expand:
-        kb.button(text="📄 Подробнее", callback_data=f"res_event_open:{event_id}:1")
+        kb.button(text="📄 Подробнее", callback_data=f"res_event_open_fav:{event_id}:1:{pos}:{city_part}")
 
     kb.button(text="✖️ Закрыть", callback_data="res_fav_close")
 
@@ -431,7 +447,13 @@ async def send_events_list(message: Message, city_slug: str, mode: str):
 
 
 # ---------- sending (favorites carousel) ----------
-async def show_favorites_carousel(message: Message, user_id: int, city_slug: str | None, pos: int, edit_message: Message | None = None):
+async def show_favorites_carousel(
+    message: Message,
+    user_id: int,
+    city_slug: str | None,
+    pos: int,
+    edit_message: Message | None = None,
+):
     ids = await fetch_favorite_event_ids(user_id=user_id, city_slug=city_slug)
     total = len(ids)
 
@@ -439,13 +461,14 @@ async def show_favorites_carousel(message: Message, user_id: int, city_slug: str
     header = f"⭐ Моё избранное • {h(city_title)}"
 
     if total == 0:
+        text = f"{header}\n\nПока избранного нет. Добавляй ⭐ из карточек событий."
         if edit_message:
             try:
-                await edit_message.edit_text(f"{header}\n\nПока избранного нет. Добавляй ⭐ из карточек событий.", parse_mode="HTML")
+                await edit_message.edit_text(text, parse_mode="HTML", reply_markup=None)
             except Exception:
-                await message.answer(f"{header}\n\nПока избранного нет. Добавляй ⭐ из карточек событий.", parse_mode="HTML")
+                await message.answer(text, parse_mode="HTML")
         else:
-            await message.answer(f"{header}\n\nПока избранного нет. Добавляй ⭐ из карточек событий.", parse_mode="HTML")
+            await message.answer(text, parse_mode="HTML")
         return
 
     pos = max(0, min(pos, total - 1))
@@ -453,15 +476,17 @@ async def show_favorites_carousel(message: Message, user_id: int, city_slug: str
 
     e = await fetch_event(event_id)
     if not e or e.status != EventStatus.ACTIVE:
-        # событие исчезло/не активно -> попробуем просто пересчитать список
-        # (физически запись Favorite можно потом чистить отдельной задачей)
+        text = f"{header}\n\nСобытие недоступно."
         if edit_message:
-            await edit_message.edit_text(f"{header}\n\nСобытие недоступно.", parse_mode="HTML")
+            try:
+                await edit_message.edit_text(text, parse_mode="HTML", reply_markup=None)
+            except Exception:
+                await message.answer(text, parse_mode="HTML")
         else:
-            await message.answer(f"{header}\n\nСобытие недоступно.", parse_mode="HTML")
+            await message.answer(text, parse_mode="HTML")
         return
 
-    fav = True  # оно в избранном по определению
+    fav = True
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
 
@@ -569,8 +594,14 @@ async def resident_filters(message: Message, state: FSMContext):
 @router.message(F.text == "⭐ Моё избранное")
 async def resident_favorites_entry(message: Message, state: FSMContext):
     data = await state.get_data()
-    city_slug = data.get("city_slug")  # если город не выбран — показываем "все города"
-    await show_favorites_carousel(message, user_id=message.from_user.id, city_slug=city_slug, pos=0, edit_message=None)
+    city_slug = data.get("city_slug")  # если город не выбран — "все города"
+    await show_favorites_carousel(
+        message=message,
+        user_id=message.from_user.id,
+        city_slug=city_slug,
+        pos=0,
+        edit_message=None,
+    )
 
 
 @router.message(F.text == "⬅️ Назад")
@@ -581,7 +612,7 @@ async def resident_back(message: Message, state: FSMContext):
 
 # ---------- callbacks: favorites carousel ----------
 @router.callback_query(F.data.startswith("res_fav_car:"))
-async def resident_favorites_carousel_cb(callback: CallbackQuery, state: FSMContext):
+async def resident_favorites_carousel_cb(callback: CallbackQuery):
     # res_fav_car:{pos}:{city}
     parts = callback.data.split(":")
     pos = int(parts[1])
@@ -607,7 +638,57 @@ async def resident_favorites_close_cb(callback: CallbackQuery):
     await callback.answer()
 
 
-# ---------- inline: open/close details + gallery ----------
+# ---------- inline: open details from carousel (with back to carousel) ----------
+@router.callback_query(F.data.startswith("res_event_open_fav:"))
+async def resident_event_open_from_fav(callback: CallbackQuery):
+    # res_event_open_fav:{event_id}:{idx}:{pos}:{city}
+    parts = callback.data.split(":")
+    event_id = int(parts[1])
+    idx = int(parts[2])
+    pos = int(parts[3])
+    city_part = parts[4] if len(parts) >= 5 else "all"
+
+    e = await fetch_event(event_id)
+    if not e or e.status != EventStatus.ACTIVE:
+        await callback.answer("Событие не найдено", show_alert=True)
+        return
+
+    fav = await is_favorite(callback.from_user.id, event_id)
+
+    photos = await fetch_event_photos(event_id)
+    total = len(photos)
+
+    back_cb = f"res_fav_car:{pos}:{city_part}"
+
+    if total <= 0:
+        await callback.message.edit_text(
+            event_details_text(e),
+            parse_mode="HTML",
+            reply_markup=event_details_kb(event_id, 1, 0, fav, back_cb=back_cb),
+        )
+        await callback.answer()
+        return
+
+    idx = max(1, min(idx, total))
+    file_id = photos[idx - 1].file_id
+
+    try:
+        await callback.message.edit_media(
+            media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
+            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=back_cb),
+        )
+    except Exception:
+        await callback.message.answer_photo(
+            photo=file_id,
+            caption=event_details_text(e),
+            parse_mode="HTML",
+            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=back_cb),
+        )
+
+    await callback.answer()
+
+
+# ---------- inline: open/close details + gallery (обычный режим) ----------
 @router.callback_query(F.data.startswith("res_event_open:"))
 async def resident_event_open(callback: CallbackQuery):
     # res_event_open:{event_id}:{idx}
@@ -629,7 +710,7 @@ async def resident_event_open(callback: CallbackQuery):
         await callback.message.edit_text(
             event_details_text(e),
             parse_mode="HTML",
-            reply_markup=event_details_kb(event_id, 1, 0, fav),
+            reply_markup=event_details_kb(event_id, 1, 0, fav, back_cb=None),
         )
         await callback.answer()
         return
@@ -640,14 +721,14 @@ async def resident_event_open(callback: CallbackQuery):
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
-            reply_markup=event_details_kb(event_id, idx, total, fav),
+            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=None),
         )
     except Exception:
         await callback.message.answer_photo(
             photo=file_id,
             caption=event_details_text(e),
             parse_mode="HTML",
-            reply_markup=event_details_kb(event_id, idx, total, fav),
+            reply_markup=event_details_kb(event_id, idx, total, fav, back_cb=None),
         )
 
     await callback.answer()
@@ -704,10 +785,13 @@ async def resident_fav_toggle(callback: CallbackQuery):
     current = await is_favorite(callback.from_user.id, event_id)
     new_state = await set_favorite(callback.from_user.id, event_id, value=not current)
 
-    # Определяем режим по кнопкам и, если это details, сохраняем текущий idx/total
+    # Определяем режим: details или нет
     is_details = False
     idx = 1
     total = 0
+    has_back_to_fav = False
+    back_cb = None
+
     if callback.message and callback.message.reply_markup:
         for row in callback.message.reply_markup.inline_keyboard:
             for btn in row:
@@ -721,6 +805,9 @@ async def resident_fav_toggle(callback: CallbackQuery):
                         total = int(b.strip())
                     except Exception:
                         pass
+                if btn.text == "↩️ В избранное":
+                    has_back_to_fav = True
+                    back_cb = btn.callback_data
 
     if is_details:
         if total <= 0:
@@ -729,40 +816,35 @@ async def resident_fav_toggle(callback: CallbackQuery):
             idx = min(max(1, idx), max(1, total))
 
         await callback.message.edit_reply_markup(
-            reply_markup=event_details_kb(event_id, idx, total, new_state)
+            reply_markup=event_details_kb(event_id, idx, total, new_state, back_cb=back_cb if has_back_to_fav else None)
         )
         await callback.answer("Добавлено" if new_state else "Убрано")
         return
 
-    # иначе: это preview или favorites-carousel (оба живут на reply_markup)
+    # Не details => либо обычный preview, либо favorites-carousel
     text = (callback.message.text or "") if callback.message else ""
     caption = (callback.message.caption or "") if callback.message else ""
     is_fav_carousel = ("⭐ Моё избранное" in text) or ("⭐ Моё избранное" in caption)
 
     if is_fav_carousel:
-        # если убрали из избранного — нужно перейти на следующий/предыдущий элемент карусели
-        # попробуем вытащить pos/total из кнопки "x/y"
+        # восстановим pos/city по callback_data стрелок
         pos = 0
-        total_local = 0
         city_slug = None
-
         if callback.message and callback.message.reply_markup:
             for row in callback.message.reply_markup.inline_keyboard:
                 for btn in row:
-                    if btn.text.count("/") == 1 and btn.text.replace("/", "").isdigit():
-                        try:
-                            a, b = btn.text.split("/", 1)
-                            pos = int(a) - 1
-                            total_local = int(b)
-                        except Exception:
-                            pass
                     if btn.callback_data and btn.callback_data.startswith("res_fav_car:"):
                         parts = btn.callback_data.split(":")
                         if len(parts) >= 3:
                             city_part = parts[2]
                             city_slug = None if city_part == "all" else city_part
+                            # pos безопасно берём как min из левой/правой — но проще: не трогаем, show_favorites_carousel сам подрежет
+                            try:
+                                pos = int(parts[1])
+                            except Exception:
+                                pass
+                            break
 
-        # перерисуем карусель с тем же pos, но список ids уже изменился
         await show_favorites_carousel(
             message=callback.message,
             user_id=callback.from_user.id,
