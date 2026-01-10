@@ -12,27 +12,25 @@ from config import ADMIN_IDS
 from database.session import get_db
 from database.models import Event, EventStatus, EventCategory, EventPhoto
 
+from services.user_activity import touch_user
+
 router = Router()
 
 DESC_PREVIEW_LEN = 120
 
-
 def h(x) -> str:
     return html.escape(str(x)) if x is not None else ""
-
 
 def compact(text: str | None) -> str:
     if not text:
         return ""
     return " ".join(text.split())
 
-
 def short(text: str | None, limit: int = DESC_PREVIEW_LEN) -> str:
     t = compact(text)
     if not t:
         return "—"
     return t if len(t) <= limit else t[:limit].rstrip() + "…"
-
 
 def roles_keyboard(user_id: int):
     kb = ReplyKeyboardBuilder()
@@ -43,7 +41,6 @@ def roles_keyboard(user_id: int):
         kb.button(text="🔧 Админ")
     kb.adjust(2)
     return kb.as_markup(resize_keyboard=True)
-
 
 def category_ru(cat: EventCategory | str) -> str:
     code = cat.value if hasattr(cat, "value") else str(cat)
@@ -57,7 +54,6 @@ def category_ru(cat: EventCategory | str) -> str:
     }
     return mapping.get(code, code)
 
-
 def category_emoji(cat: EventCategory | str) -> str:
     code = cat.value if hasattr(cat, "value") else str(cat)
     mapping = {
@@ -70,23 +66,19 @@ def category_emoji(cat: EventCategory | str) -> str:
     }
     return mapping.get(code, "✨")
 
-
 def fmt_when(e: Event) -> str:
     if e.event_date:
         ds = e.event_date.strftime("%d.%m.%Y")
         ts = e.event_time_start.strftime("%H:%M") if e.event_time_start else "—"
         te = e.event_time_end.strftime("%H:%M") if e.event_time_end else "—"
         return f"{ds} • {ts}-{te}"
-
     if e.period_start and e.period_end:
         ps = e.period_start.strftime("%d.%m.%Y")
         pe = e.period_end.strftime("%d.%m.%Y")
         ts = e.working_hours_start.strftime("%H:%M") if e.working_hours_start else "—"
         te = e.working_hours_end.strftime("%H:%M") if e.working_hours_end else "—"
         return f"{ps}-{pe} • {ts}-{te}"
-
     return "—"
-
 
 def fmt_price(e: Event) -> str:
     if e.price_admission is None:
@@ -96,16 +88,14 @@ def fmt_price(e: Event) -> str:
         s = str(int(v)) if v.is_integer() else str(v)
     except Exception:
         s = str(e.price_admission)
-
     if e.category == EventCategory.CONCERT:
         return f"от {s} ₽"
     return f"{s} ₽"
 
-
 def event_deeplink_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     return (
-        f"🎫 <b>{h(e.title)}</b>\n"
+        f"🎫 {h(e.title)}\n"
         f"🏷 {h(cat)}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
         f"📅 Когда: {h(fmt_when(e))}\n"
@@ -114,7 +104,6 @@ def event_deeplink_text(e: Event) -> str:
         f"━━━━━━━━━━━━━━━━━━\n"
         f"📝 Описание: {h(short(e.description))}"
     )
-
 
 async def fetch_event_first_photo(event_id: int) -> str | None:
     async with get_db() as db:
@@ -127,7 +116,6 @@ async def fetch_event_first_photo(event_id: int) -> str | None:
             )
         ).scalar_one_or_none()
         return p.file_id if p else None
-
 
 async def open_event_by_deeplink(message: Message, event_id: int) -> bool:
     async with get_db() as db:
@@ -155,18 +143,20 @@ async def open_event_by_deeplink(message: Message, event_id: int) -> bool:
             parse_mode="HTML",
             reply_markup=roles_keyboard(message.from_user.id),
         )
-
     return True
-
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, command: CommandObject):
-    # payload после /start
+    # фиксируем пользователя + last_seen_at
+    await touch_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
     args_raw = (command.args or "").strip()
 
-    # поддержка двух форматов:
-    # 1) простой: /start e123
-    # 2) если когда-то начнёшь encode=True: /start <base64> -> decode_payload()
     if args_raw:
         args = args_raw
         if not args_raw.lower().startswith("e") and all(ch.isalnum() or ch in "-_" for ch in args_raw):
@@ -176,18 +166,15 @@ async def cmd_start(message: Message, command: CommandObject):
                 args = args_raw
 
         low = args.lower()
-
-        # /start e123
         if low.startswith("e"):
             raw_id = low[1:].strip()
             if raw_id.isdigit():
                 if await open_event_by_deeplink(message, int(raw_id)):
                     return
 
-    # обычный старт
     await message.answer(
-        "🎉 <b>EventsNow — Добро пожаловать!</b>\n\n"
-        "<i>Все события твоего города в одном месте</i>\n\n"
+        "🎉 EventsNow — Добро пожаловать!\n\n"
+        "Все события твоего города в одном месте\n\n"
         "👇 Выбери роль:",
         reply_markup=roles_keyboard(message.from_user.id),
         parse_mode="HTML",

@@ -31,6 +31,14 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db():
     from database.models import Base
+    from database.migrations import apply_sqlite_migrations
+
     async with engine.begin() as conn:
+        # 1) Создаём отсутствующие таблицы по моделям
         await conn.run_sync(Base.metadata.create_all)
+
+        # 2) Докидываем недостающие колонки/таблицы в уже существующую БД
+        await apply_sqlite_migrations(conn)
+
     print("✅ База данных инициализирована!")
+

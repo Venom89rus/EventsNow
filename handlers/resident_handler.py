@@ -1,5 +1,6 @@
 import html
 import urllib.parse
+
 from datetime import date, timedelta
 
 from aiogram import Router, F
@@ -22,10 +23,12 @@ from config import CITIES, DEFAULT_CITY
 from database.session import get_db
 from database.models import Event, EventStatus, EventCategory, EventPhoto, Favorite
 
+from services.user_activity import touch_user
+
 router = Router()
 
 CITIES_PER_PAGE = 5
-EVENTS_LIMIT_DEFAULT = 5
+EVENTS_LIMIT_DEFAULT =15
 DESC_PREVIEW_LEN = 100
 MAX_PHOTOS = 5
 
@@ -50,6 +53,24 @@ def short(text: str | None, limit: int = DESC_PREVIEW_LEN) -> str:
     if not t:
         return "—"
     return t if len(t) <= limit else t[:limit].rstrip() + "…"
+
+
+async def _touch_from_message(message: Message) -> None:
+    await touch_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
+
+async def _touch_from_callback(callback: CallbackQuery) -> None:
+    await touch_user(
+        telegram_id=callback.from_user.id,
+        username=callback.from_user.username,
+        first_name=callback.from_user.first_name,
+        last_name=callback.from_user.last_name,
+    )
 
 
 async def build_share_url(bot, event_id: int, title: str | None = None) -> str:
@@ -141,6 +162,7 @@ def cities_keyboard(page: int = 0) -> InlineKeyboardMarkup:
         nav.button(text="« Назад", callback_data=f"res_page:{page-1}")
     if page < total_pages - 1:
         nav.button(text="Вперёд »", callback_data=f"res_page:{page+1}")
+
     if page > 0 or page < total_pages - 1:
         kb.row(*nav.buttons)
 
@@ -188,19 +210,75 @@ def fmt_when(e: Event) -> str:
         return f"{ps}-{pe} • {ts}-{te}"
     return "—"
 
-
 def fmt_price(e: Event) -> str:
+    """
+    Возвращает строку цены для карточек Жителя.
+
+    Поддерживает:
+    - простую цену (e.price_admission)
+    - tier-цены (e.admission_price_json) вида {"дети":200,"взрослые":500}
+    """
+    # 1) Tier pricing (JSON) — приоритетнее, т.к. при tier у тебя price_admission обычно None
+    raw_json = getattr(e, "admission_price_json", None)
+    if raw_json:
+        try:
+            import json
+            data = json.loads(raw_json)
+
+            if isinstance(data, dict) and data:
+                # нормализуем/фильтруем
+                items: list[tuple[str, float]] = []
+                for k, v in data.items():
+                    if k is None:
+                        continue
+                    key = str(k).strip()
+                    if not key:
+                        continue
+                    try:
+                        val = float(v)
+                    except Exception:
+                        continue
+                    if val < 0:
+                        continue
+                    items.append((key, val))
+
+                if items:
+                    # порядок показа: если есть известные ключи — показываем в привычном порядке,
+                    # остальное — в конце
+                    preferred = ["все", "дети", "студенты", "взрослые", "пенсионеры"]
+                    order = {name: i for i, name in enumerate(preferred)}
+                    items.sort(key=lambda kv: (order.get(kv[0].lower(), 999), kv[0].lower()))
+
+                    def _fmt_num(x: float) -> str:
+                        return str(int(x)) if float(x).is_integer() else str(x)
+
+                    # если единственный ключ "все" — выводим как обычную цену
+                    if len(items) == 1 and items[0][0].lower() == "все":
+                        s = _fmt_num(items[0][1])
+                        if e.category == EventCategory.CONCERT:
+                            return f"от {s} ₽"
+                        return f"{s} ₽"
+
+                    parts = [f"{k} — {_fmt_num(v)} ₽" for k, v in items]
+                    # коротко и читабельно в одну строку
+                    return "; ".join(parts)
+        except Exception:
+            # если json битый — просто проваливаемся к простой цене
+            pass
+
+    # 2) Простая цена
     if e.price_admission is None:
         return "—"
+
     try:
         v = float(e.price_admission)
         s = str(int(v)) if v.is_integer() else str(v)
     except Exception:
         s = str(e.price_admission)
+
     if e.category == EventCategory.CONCERT:
         return f"от {s} ₽"
     return f"{s} ₽"
-
 
 async def fetch_event_photos(event_id: int) -> list[EventPhoto]:
     async with get_db() as db:
@@ -213,7 +291,6 @@ async def fetch_event_photos(event_id: int) -> list[EventPhoto]:
             )
         ).scalars().all()
         return list(rows)
-
 
 def _event_overlaps_range_condition(date_from: date, date_to: date):
     return or_(
@@ -239,7 +316,6 @@ def _event_is_upcoming_or_ongoing_condition(today: date):
 
 async def fetch_events(city_slug: str, mode: str):
     today = date.today()
-
     start_dt = func.coalesce(Event.event_date, Event.period_start)
 
     if mode == "archive":
@@ -264,7 +340,7 @@ async def fetch_events(city_slug: str, mode: str):
             where.append(_event_overlaps_range_condition(today, d2))
             order_by = [start_dt.asc().nullslast(), desc(Event.created_at)]
         else:
-            # "last" => только актуальные, но сортировка по created_at
+            # "last"
             mode = "last"
             where.append(_event_is_upcoming_or_ongoing_condition(today))
             order_by = [desc(Event.created_at)]
@@ -278,7 +354,8 @@ async def fetch_events(city_slug: str, mode: str):
                 .limit(EVENTS_LIMIT_DEFAULT)
             )
         ).scalars().all()
-        return events, mode
+
+    return events, mode
 
 
 async def fetch_favorite_event_ids(user_id: int, city_slug: str | None = None) -> list[int]:
@@ -292,8 +369,10 @@ async def fetch_favorite_event_ids(user_id: int, city_slug: str | None = None) -
             )
             .order_by(desc(Favorite.added_at))
         )
+
         if city_slug:
             q = q.where(Event.city_slug == city_slug)
+
         ids = (await db.execute(q)).scalars().all()
         return list(ids)
 
@@ -330,6 +409,7 @@ def event_details_kb(event_id: int, idx: int, total: int, fav: bool, share_url: 
 
     if back_cb:
         kb.button(text="↩️ В избранное", callback_data=back_cb)
+
     kb.button(text="❌ Закрыть", callback_data=f"res_event_close:{event_id}")
     kb.adjust(2, 1)
     return kb.as_markup()
@@ -353,11 +433,13 @@ def favorites_carousel_kb(
         kb.button(text="➡️", callback_data=f"res_fav_car:{min(total-1, pos+1)}:{city_part}")
         kb.adjust(3)
 
-    star_text = "✅ В избранном"
+    star_text = "✅ В избранном" if fav else "⭐ В избранное"
     kb.button(text=star_text, callback_data=f"res_fav_toggle:{event_id}")
     kb.button(text="🔗 Поделиться", url=share_url)
+
     if can_expand:
         kb.button(text="🔎 Подробнее", callback_data=f"res_event_open_fav:{event_id}:1:{pos}:{city_part}")
+
     kb.button(text="❌ Закрыть", callback_data="res_fav_close")
     kb.adjust(2, 1, 1)
     return kb.as_markup()
@@ -366,11 +448,11 @@ def favorites_carousel_kb(
 def event_preview_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     return (
-        f"<b>{h(e.title)}</b>\n"
+        f"{h(e.title)}\n"
         f"{h(cat)}\n\n"
-        f"<b>Когда:</b> {h(fmt_when(e))}\n"
-        f"<b>Где:</b> {h(e.location)}\n"
-        f"<b>Цена:</b> {h(fmt_price(e))}\n\n"
+        f"Когда: {h(fmt_when(e))}\n"
+        f"Где: {h(e.location)}\n"
+        f"Цена: {h(fmt_price(e))}\n\n"
         f"{h(short(e.description))}"
     )
 
@@ -379,12 +461,12 @@ def event_details_text(e: Event) -> str:
     cat = f"{category_emoji(e.category)} {category_ru(e.category)}"
     city_name = CITIES.get(e.city_slug, {}).get("name", e.city_slug)
     return (
-        f"<b>{h(e.title)}</b>\n"
+        f"{h(e.title)}\n"
         f"{h(cat)}\n"
-        f"<b>{h(city_name)}</b>\n\n"
-        f"<b>Когда:</b> {h(fmt_when(e))}\n"
-        f"<b>Где:</b> {h(e.location)}\n"
-        f"<b>Цена:</b> {h(fmt_price(e))}\n\n"
+        f"{h(city_name)}\n\n"
+        f"Когда: {h(fmt_when(e))}\n"
+        f"Где: {h(e.location)}\n"
+        f"Цена: {h(fmt_price(e))}\n\n"
         f"{h(compact(e.description) or '—')}"
     )
 
@@ -392,6 +474,7 @@ def event_details_text(e: Event) -> str:
 async def send_event_preview(message: Message, e: Event):
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
+
     fav = await is_favorite(message.from_user.id, e.id)
     share_url = await build_share_url(message.bot, e.id, title=e.title)
 
@@ -413,7 +496,6 @@ async def send_event_preview(message: Message, e: Event):
 
 async def send_events_list(message: Message, city_slug: str, mode: str):
     city_name = CITIES.get(city_slug, {}).get("name", city_slug)
-
     title_map = {
         "last": "🆕 Последние (актуальные)",
         "today": "🕘 Сегодня",
@@ -424,8 +506,9 @@ async def send_events_list(message: Message, city_slug: str, mode: str):
     }
 
     events, mode = await fetch_events(city_slug, mode)
+
     await message.answer(
-        f"<b>{h(city_name)}</b>\n{h(title_map.get(mode, mode))}\nПоказано: {len(events)} (лимит {EVENTS_LIMIT_DEFAULT})",
+        f"{h(city_name)}\n{h(title_map.get(mode, mode))}\nПоказано: {len(events)} (лимит {EVENTS_LIMIT_DEFAULT})",
         parse_mode="HTML",
     )
 
@@ -478,8 +561,8 @@ async def show_favorites_carousel(
 
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
-    share_url = await build_share_url(message.bot, e.id, title=e.title)
 
+    share_url = await build_share_url(message.bot, e.id, title=e.title)
     caption = f"{header}\n\n{event_preview_text(e)}"
     kb = favorites_carousel_kb(pos, total, e.id, True, can_expand, city_slug, share_url)
 
@@ -505,11 +588,18 @@ async def show_favorites_carousel(
 
 @router.message(F.text == "🏠 Житель")
 async def resident_entry(message: Message, state: FSMContext):
+    await _touch_from_message(message)
+
     await state.clear()
     await state.set_state(ResidentState.choosing_city)
 
     default_city_name = CITIES.get(DEFAULT_CITY, {}).get("name", DEFAULT_CITY)
-    await message.answer(f"Город по умолчанию: <b>{h(default_city_name)}</b>", reply_markup=resident_menu_kb(), parse_mode="HTML")
+
+    await message.answer(
+        f"Город по умолчанию: {h(default_city_name)}",
+        reply_markup=resident_menu_kb(),
+        parse_mode="HTML",
+    )
     await message.answer("Выбери город:", reply_markup=cities_keyboard(page=0), parse_mode="HTML")
 
 
@@ -522,8 +612,11 @@ async def resident_page_cb(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("res_city:"))
 async def resident_city_select(callback: CallbackQuery, state: FSMContext):
+    await _touch_from_callback(callback)
+
     slug = callback.data.split(":")[1]
     info = CITIES.get(slug)
+
     if not info:
         await callback.answer("Город не найден", show_alert=True)
         return
@@ -537,22 +630,25 @@ async def resident_city_select(callback: CallbackQuery, state: FSMContext):
         pass
 
     if status != "active":
-        await callback.message.answer(f"<b>{h(city_name)}</b>\nГород пока недоступен.", parse_mode="HTML")
+        await callback.message.answer(f"{h(city_name)}\nГород пока недоступен.", parse_mode="HTML")
         await callback.answer()
         return
 
     await state.set_state(ResidentState.browsing)
     await state.update_data(city_slug=slug, mode="last")
 
-    await callback.message.answer(f"<b>{h(city_name)}</b> выбран!", parse_mode="HTML")
+    await callback.message.answer(f"{h(city_name)} выбран!", parse_mode="HTML")
     await send_events_list(callback.message, slug, "last")
     await callback.answer()
 
 
 @router.message(F.text.in_({"🕘 Сегодня", "📆 3 дня", "📅 Неделя", "🗓 Месяц", "🆕 Последние", "🗂 Архив"}))
 async def resident_filters(message: Message, state: FSMContext):
+    await _touch_from_message(message)
+
     data = await state.get_data()
     city_slug = data.get("city_slug")
+
     if not city_slug:
         await message.answer("Сначала выбери город.", parse_mode="HTML")
         return
@@ -565,27 +661,40 @@ async def resident_filters(message: Message, state: FSMContext):
         "🆕 Последние": "last",
         "🗂 Архив": "archive",
     }
-    mode = text_to_mode.get(message.text, "last")
 
+    mode = text_to_mode.get(message.text, "last")
     await state.update_data(mode=mode)
+
     await send_events_list(message, city_slug, mode)
 
 
 @router.message(F.text == "⭐ Моё избранное")
 async def resident_favorites_entry(message: Message, state: FSMContext):
+    await _touch_from_message(message)
+
     data = await state.get_data()
     city_slug = data.get("city_slug")
-    await show_favorites_carousel(message=message, user_id=message.from_user.id, city_slug=city_slug, pos=0, edit_message=None)
+
+    await show_favorites_carousel(
+        message=message,
+        user_id=message.from_user.id,
+        city_slug=city_slug,
+        pos=0,
+        edit_message=None,
+    )
 
 
 @router.message(F.text == "⬅️ Назад")
 async def resident_back(message: Message, state: FSMContext):
+    await _touch_from_message(message)
+
     await state.clear()
     await message.answer("Главное меню:", reply_markup=main_menu_kb())
 
-
 @router.callback_query(F.data.startswith("res_fav_car:"))
 async def resident_favorites_carousel_cb(callback: CallbackQuery):
+    await _touch_from_callback(callback)
+
     parts = callback.data.split(":")
     pos = int(parts[1])
     city_part = parts[2] if len(parts) >= 3 else "all"
@@ -603,6 +712,8 @@ async def resident_favorites_carousel_cb(callback: CallbackQuery):
 
 @router.callback_query(F.data == "res_fav_close")
 async def resident_favorites_close_cb(callback: CallbackQuery):
+    await _touch_from_callback(callback)
+
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except Exception:
@@ -612,6 +723,8 @@ async def resident_favorites_close_cb(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("res_event_open_fav:"))
 async def resident_event_open_from_fav(callback: CallbackQuery):
+    await _touch_from_callback(callback)
+
     parts = callback.data.split(":")
     event_id = int(parts[1])
     idx = int(parts[2])
@@ -626,6 +739,7 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
     fav = await is_favorite(callback.from_user.id, event_id)
     photos = await fetch_event_photos(event_id)
     total = len(photos)
+
     back_cb = f"res_fav_car:{pos}:{city_part}"
     share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
@@ -640,6 +754,7 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
 
     idx = max(1, min(idx, total))
     file_id = photos[idx - 1].file_id
+
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
@@ -652,11 +767,14 @@ async def resident_event_open_from_fav(callback: CallbackQuery):
             parse_mode="HTML",
             reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=back_cb),
         )
+
     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("res_event_open:"))
 async def resident_event_open(callback: CallbackQuery):
+    await _touch_from_callback(callback)
+
     parts = callback.data.split(":")
     event_id = int(parts[1])
     idx = int(parts[2]) if len(parts) >= 3 else 1
@@ -682,6 +800,7 @@ async def resident_event_open(callback: CallbackQuery):
 
     idx = max(1, min(idx, total))
     file_id = photos[idx - 1].file_id
+
     try:
         await callback.message.edit_media(
             media=InputMediaPhoto(media=file_id, caption=event_details_text(e), parse_mode="HTML"),
@@ -694,11 +813,14 @@ async def resident_event_open(callback: CallbackQuery):
             parse_mode="HTML",
             reply_markup=event_details_kb(event_id, idx, total, fav, share_url, back_cb=None),
         )
+
     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("res_event_close:"))
 async def resident_event_close(callback: CallbackQuery):
+    await _touch_from_callback(callback)
+
     event_id = int(callback.data.split(":")[1])
 
     e = await fetch_event(event_id)
@@ -707,6 +829,7 @@ async def resident_event_close(callback: CallbackQuery):
         return
 
     fav = await is_favorite(callback.from_user.id, event_id)
+
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
     share_url = await build_share_url(callback.bot, event_id, title=e.title)
@@ -737,6 +860,8 @@ async def resident_event_close(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("res_fav_toggle:"))
 async def resident_fav_toggle(callback: CallbackQuery):
+    await _touch_from_callback(callback)
+
     event_id = int(callback.data.split(":")[1])
 
     e = await fetch_event(event_id)
@@ -753,6 +878,7 @@ async def resident_fav_toggle(callback: CallbackQuery):
     has_back_to_fav = False
     back_cb = None
 
+    # Пытаемся понять контекст сообщения по inline-кнопкам
     if callback.message and callback.message.reply_markup:
         for row in callback.message.reply_markup.inline_keyboard:
             for btn in row:
@@ -772,6 +898,7 @@ async def resident_fav_toggle(callback: CallbackQuery):
 
     share_url = await build_share_url(callback.bot, event_id, title=e.title)
 
+    # Если это экран "details" — просто перерисуем клавиатуру деталей
     if is_details:
         if total <= 0:
             photos = await fetch_event_photos(event_id)
@@ -779,12 +906,18 @@ async def resident_fav_toggle(callback: CallbackQuery):
         idx = min(max(1, idx), max(1, total))
         await callback.message.edit_reply_markup(
             reply_markup=event_details_kb(
-                event_id, idx, total, new_state, share_url, back_cb=back_cb if has_back_to_fav else None
+                event_id,
+                idx,
+                total,
+                new_state,
+                share_url,
+                back_cb=back_cb if has_back_to_fav else None,
             )
         )
         await callback.answer("Добавлено" if new_state else "Убрано")
         return
 
+    # Если это карусель избранного — нужно пересобрать карточку (возможно элемент пропал)
     text = (callback.message.text or "") if callback.message else ""
     caption = (callback.message.caption or "") if callback.message else ""
     is_fav_carousel = ("⭐ Моё избранное" in text) or ("⭐ Моё избранное" in caption)
@@ -816,6 +949,7 @@ async def resident_fav_toggle(callback: CallbackQuery):
         await callback.answer("Добавлено" if new_state else "Убрано")
         return
 
+    # Обычная карточка preview: просто обновим inline клавиатуру preview
     full_desc = compact(e.description)
     can_expand = bool(full_desc) and len(full_desc) > DESC_PREVIEW_LEN
 

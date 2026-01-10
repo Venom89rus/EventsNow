@@ -2377,3 +2377,1513 @@ aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: messa
 2026-01-10 03:13:31,500 - aiogram.event - INFO - Update id=605165764 is handled. Duration 707 ms by bot id=8341383973
 2026-01-10 03:13:34,184 - aiogram.event - INFO - Update id=605165765 is handled. Duration 250 ms by bot id=8341383973
 2026-01-10 03:13:37,828 - aiogram.event - INFO - Update id=605165766 is handled. Duration 150 ms by bot id=8341383973
+2026-01-10 03:45:26,747 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2026-01-10 03:45:26,750 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8341383973)
+2026-01-10 03:45:28,072 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8341383973)
+2026-01-10 03:45:28,427 - aiogram.event - INFO - Update id=605165767 is handled. Duration 354 ms by bot id=8341383973
+2026-01-10 04:31:31,773 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2026-01-10 04:31:31,808 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8341383973)
+2026-01-10 04:31:32,877 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Network is unreachable]
+2026-01-10 04:31:32,877 - aiogram.dispatcher - WARNING - Sleep for 1.070354 seconds and try again... (tryings = 1, bot id = 8341383973)
+2026-01-10 04:31:33,950 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Network is unreachable]
+2026-01-10 04:31:33,950 - aiogram.dispatcher - WARNING - Sleep for 1.477834 seconds and try again... (tryings = 2, bot id = 8341383973)
+2026-01-10 04:31:35,430 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Network is unreachable]
+2026-01-10 04:31:35,430 - aiogram.dispatcher - WARNING - Sleep for 1.968382 seconds and try again... (tryings = 3, bot id = 8341383973)
+2026-01-10 04:31:47,512 - aiogram.dispatcher - INFO - Connection established (tryings = 4, bot id = 8341383973)
+2026-01-10 06:16:27,245 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2026-01-10 06:16:27,257 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8341383973)
+2026-01-10 06:16:38,613 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8341383973)
+2026-01-10 08:18:34,886 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2026-01-10 08:18:34,895 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8341383973)
+2026-01-10 08:18:46,266 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8341383973)
+2026-01-10 08:37:56,102 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 54] Connection reset by peer
+2026-01-10 08:37:56,105 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8341383973)
+2026-01-10 08:38:07,445 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8341383973)
+2026-01-10 09:06:01,495 - aiogram.event - INFO - Update id=605165768 is handled. Duration 502 ms by bot id=8341383973
+2026-01-10 09:21:35,019 - aiogram.event - INFO - Update id=605165769 is handled. Duration 637 ms by bot id=8341383973
+2026-01-10 09:22:57,995 - aiogram.event - INFO - Update id=605165770 is handled. Duration 124 ms by bot id=8341383973
+2026-01-10 09:23:00,650 - aiogram.event - INFO - Update id=605165771 is handled. Duration 364 ms by bot id=8341383973
+2026-01-10 09:45:51,949 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Connect call failed ('149.154.166.110', 443)]
+2026-01-10 09:45:51,957 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8341383973)
+2026-01-10 09:46:03,342 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8341383973)
+2026-01-10 10:26:12,770 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 10:26:12,794 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 10:26:12,795 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 10:28:25,556 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 10:28:25,558 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 10:28:25,900 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 10:28:37,614 - aiogram.event - INFO - Update id=605165772 is not handled. Duration 7 ms by bot id=8341383973
+2026-01-10 10:28:37,614 - aiogram.event - ERROR - Cause exception while process update id=605165772 by bot id=8341383973
+OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (823223744,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlite3.OperationalError: no such column: users.last_seen_at
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/start_handler.py", line 151, in cmd_start
+    await touch_user(
+    ...<4 lines>...
+    )
+  File "/Users/a1234/Desktop/EventsNow/services/user_activity.py", line 10, in touch_user
+    u = (await db.execute(select(User).where(User.telegram_id == telegram_id))).scalar_one_or_none()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (823223744,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-10 10:30:26,857 - aiogram.event - INFO - Update id=605165773 is not handled. Duration 17 ms by bot id=8341383973
+2026-01-10 10:30:26,859 - aiogram.event - ERROR - Cause exception while process update id=605165773 by bot id=8341383973
+OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlite3.OperationalError: no such column: users.last_seen_at
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/start_handler.py", line 151, in cmd_start
+    await touch_user(
+    ...<4 lines>...
+    )
+  File "/Users/a1234/Desktop/EventsNow/services/user_activity.py", line 10, in touch_user
+    u = (await db.execute(select(User).where(User.telegram_id == telegram_id))).scalar_one_or_none()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-10 10:30:32,959 - aiogram.event - INFO - Update id=605165774 is not handled. Duration 2 ms by bot id=8341383973
+2026-01-10 10:30:32,960 - aiogram.event - ERROR - Cause exception while process update id=605165774 by bot id=8341383973
+OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlite3.OperationalError: no such column: users.last_seen_at
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/start_handler.py", line 151, in cmd_start
+    await touch_user(
+    ...<4 lines>...
+    )
+  File "/Users/a1234/Desktop/EventsNow/services/user_activity.py", line 10, in touch_user
+    u = (await db.execute(select(User).where(User.telegram_id == telegram_id))).scalar_one_or_none()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-10 10:30:59,364 - aiogram.event - INFO - Update id=605165775 is not handled. Duration 2 ms by bot id=8341383973
+2026-01-10 10:30:59,365 - aiogram.event - ERROR - Cause exception while process update id=605165775 by bot id=8341383973
+OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlite3.OperationalError: no such column: users.last_seen_at
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/start_handler.py", line 151, in cmd_start
+    await touch_user(
+    ...<4 lines>...
+    )
+  File "/Users/a1234/Desktop/EventsNow/services/user_activity.py", line 10, in touch_user
+    u = (await db.execute(select(User).where(User.telegram_id == telegram_id))).scalar_one_or_none()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-10 10:31:06,213 - aiogram.event - INFO - Update id=605165776 is not handled. Duration 4 ms by bot id=8341383973
+2026-01-10 10:31:06,213 - aiogram.event - ERROR - Cause exception while process update id=605165776 by bot id=8341383973
+OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlite3.OperationalError: no such column: users.last_seen_at
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/start_handler.py", line 151, in cmd_start
+    await touch_user(
+    ...<4 lines>...
+    )
+  File "/Users/a1234/Desktop/EventsNow/services/user_activity.py", line 10, in touch_user
+    u = (await db.execute(select(User).where(User.telegram_id == telegram_id))).scalar_one_or_none()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 449, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 180, in execute
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 340, in _handle_exception
+    raise error
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 162, in execute
+    self.await_(_cursor.execute(operation, parameters))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: users.last_seen_at
+[SQL: SELECT users.id, users.telegram_id, users.username, users.first_name, users.last_name, users.phone, users.role, users.city_slug, users.created_at, users.updated_at, users.last_seen_at 
+FROM users 
+WHERE users.telegram_id = ?]
+[parameters: (5249790483,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-10 10:34:46,367 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 10:34:46,368 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 10:34:46,714 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 10:35:00,886 - aiogram.event - INFO - Update id=605165777 is handled. Duration 365 ms by bot id=8341383973
+2026-01-10 10:35:04,352 - aiogram.event - INFO - Update id=605165778 is handled. Duration 374 ms by bot id=8341383973
+2026-01-10 10:35:06,773 - aiogram.event - INFO - Update id=605165779 is handled. Duration 231 ms by bot id=8341383973
+2026-01-10 10:35:10,722 - aiogram.event - INFO - Update id=605165780 is handled. Duration 219 ms by bot id=8341383973
+2026-01-10 10:35:52,492 - aiogram.event - INFO - Update id=605165781 is handled. Duration 123 ms by bot id=8341383973
+2026-01-10 10:36:25,506 - aiogram.event - INFO - Update id=605165782 is handled. Duration 118 ms by bot id=8341383973
+2026-01-10 10:36:38,807 - aiogram.event - INFO - Update id=605165783 is handled. Duration 138 ms by bot id=8341383973
+2026-01-10 10:36:49,608 - aiogram.event - INFO - Update id=605165784 is handled. Duration 118 ms by bot id=8341383973
+2026-01-10 10:36:53,537 - aiogram.event - INFO - Update id=605165785 is handled. Duration 125 ms by bot id=8341383973
+2026-01-10 10:37:24,950 - aiogram.event - INFO - Update id=605165786 is handled. Duration 119 ms by bot id=8341383973
+2026-01-10 10:37:29,492 - aiogram.event - INFO - Update id=605165787 is handled. Duration 128 ms by bot id=8341383973
+2026-01-10 10:37:33,724 - aiogram.event - INFO - Update id=605165788 is handled. Duration 559 ms by bot id=8341383973
+2026-01-10 10:37:43,144 - aiogram.event - INFO - Update id=605165789 is handled. Duration 126 ms by bot id=8341383973
+2026-01-10 10:37:45,939 - aiogram.event - INFO - Update id=605165790 is handled. Duration 579 ms by bot id=8341383973
+2026-01-10 10:37:50,832 - aiogram.event - INFO - Update id=605165791 is handled. Duration 262 ms by bot id=8341383973
+2026-01-10 10:38:05,513 - aiogram.event - INFO - Update id=605165792 is handled. Duration 401 ms by bot id=8341383973
+2026-01-10 10:38:11,079 - aiogram.event - INFO - Update id=605165793 is handled. Duration 608 ms by bot id=8341383973
+2026-01-10 10:38:13,321 - aiogram.event - INFO - Update id=605165794 is handled. Duration 356 ms by bot id=8341383973
+2026-01-10 10:38:15,480 - aiogram.event - INFO - Update id=605165795 is handled. Duration 255 ms by bot id=8341383973
+2026-01-10 10:38:18,239 - aiogram.event - INFO - Update id=605165796 is handled. Duration 144 ms by bot id=8341383973
+2026-01-10 10:38:30,465 - aiogram.event - INFO - Update id=605165797 is handled. Duration 248 ms by bot id=8341383973
+2026-01-10 10:38:35,349 - aiogram.event - INFO - Update id=605165798 is handled. Duration 129 ms by bot id=8341383973
+2026-01-10 10:38:37,465 - aiogram.event - INFO - Update id=605165799 is handled. Duration 720 ms by bot id=8341383973
+2026-01-10 10:38:40,249 - aiogram.event - INFO - Update id=605165800 is handled. Duration 1678 ms by bot id=8341383973
+2026-01-10 10:38:49,591 - aiogram.event - INFO - Update id=605165801 is handled. Duration 1432 ms by bot id=8341383973
+2026-01-10 10:38:56,066 - aiogram.event - INFO - Update id=605165802 is handled. Duration 1332 ms by bot id=8341383973
+2026-01-10 10:39:02,155 - aiogram.event - INFO - Update id=605165803 is handled. Duration 137 ms by bot id=8341383973
+2026-01-10 10:39:03,961 - aiogram.event - INFO - Update id=605165804 is not handled. Duration 8 ms by bot id=8341383973
+2026-01-10 11:01:24,774 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:01:24,814 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:01:24,819 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:01:24,881 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:01:31,642 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:01:31,643 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:01:31,974 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:01:42,324 - aiogram.event - INFO - Update id=605165805 is handled. Duration 332 ms by bot id=8341383973
+2026-01-10 11:01:52,092 - aiogram.event - INFO - Update id=605165806 is handled. Duration 329 ms by bot id=8341383973
+2026-01-10 11:01:54,933 - aiogram.event - INFO - Update id=605165807 is handled. Duration 653 ms by bot id=8341383973
+2026-01-10 11:01:58,101 - aiogram.event - INFO - Update id=605165808 is handled. Duration 231 ms by bot id=8341383973
+2026-01-10 11:02:09,772 - aiogram.event - INFO - Update id=605165809 is handled. Duration 171 ms by bot id=8341383973
+2026-01-10 11:02:23,976 - aiogram.event - INFO - Update id=605165810 is handled. Duration 162 ms by bot id=8341383973
+2026-01-10 11:02:39,594 - aiogram.event - INFO - Update id=605165811 is handled. Duration 495 ms by bot id=8341383973
+2026-01-10 11:02:46,126 - aiogram.event - INFO - Update id=605165812 is handled. Duration 230 ms by bot id=8341383973
+2026-01-10 11:02:52,525 - aiogram.event - INFO - Update id=605165813 is handled. Duration 422 ms by bot id=8341383973
+2026-01-10 11:03:10,243 - aiogram.event - INFO - Update id=605165814 is handled. Duration 427 ms by bot id=8341383973
+2026-01-10 11:03:15,921 - aiogram.event - INFO - Update id=605165815 is handled. Duration 123 ms by bot id=8341383973
+2026-01-10 11:03:29,170 - aiogram.event - INFO - Update id=605165816 is handled. Duration 589 ms by bot id=8341383973
+2026-01-10 11:03:34,753 - aiogram.event - INFO - Update id=605165817 is handled. Duration 316 ms by bot id=8341383973
+2026-01-10 11:03:41,414 - aiogram.event - INFO - Update id=605165818 is handled. Duration 640 ms by bot id=8341383973
+2026-01-10 11:04:31,355 - aiogram.event - INFO - Update id=605165819 is handled. Duration 1042 ms by bot id=8341383973
+2026-01-10 11:05:21,952 - aiogram.event - INFO - Update id=605165820 is handled. Duration 1400 ms by bot id=8341383973
+2026-01-10 11:05:28,488 - aiogram.event - INFO - Update id=605165821 is handled. Duration 3107 ms by bot id=8341383973
+2026-01-10 11:05:34,291 - aiogram.event - INFO - Update id=605165822 is handled. Duration 1845 ms by bot id=8341383973
+2026-01-10 11:05:36,372 - aiogram.event - INFO - Update id=605165823 is handled. Duration 601 ms by bot id=8341383973
+2026-01-10 11:05:40,147 - aiogram.event - INFO - Update id=605165824 is handled. Duration 1093 ms by bot id=8341383973
+2026-01-10 11:05:42,835 - aiogram.event - INFO - Update id=605165825 is handled. Duration 1501 ms by bot id=8341383973
+2026-01-10 11:05:46,615 - aiogram.event - INFO - Update id=605165826 is handled. Duration 520 ms by bot id=8341383973
+2026-01-10 11:05:54,291 - aiogram.event - INFO - Update id=605165827 is handled. Duration 380 ms by bot id=8341383973
+2026-01-10 11:05:56,531 - aiogram.event - INFO - Update id=605165828 is handled. Duration 478 ms by bot id=8341383973
+2026-01-10 11:06:00,142 - aiogram.event - INFO - Update id=605165829 is handled. Duration 302 ms by bot id=8341383973
+2026-01-10 11:06:12,421 - aiogram.event - INFO - Update id=605165830 is handled. Duration 7487 ms by bot id=8341383973
+2026-01-10 11:06:18,494 - aiogram.event - INFO - Update id=605165831 is handled. Duration 3012 ms by bot id=8341383973
+2026-01-10 11:11:59,675 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:11:59,699 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:11:59,700 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:11:59,717 - aiogram.event - INFO - Update id=605165832 is not handled. Duration 754 ms by bot id=8341383973
+2026-01-10 11:11:59,718 - aiogram.event - ERROR - Cause exception while process update id=605165832 by bot id=8341383973
+TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/session/aiohttp.py", line 167, in make_request
+    async with session.post(
+               ~~~~~~~~~~~~^
+        url,
+        ^^^^
+        data=form,
+        ^^^^^^^^^^
+        timeout=self.timeout if timeout is None else timeout,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as resp:
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiohttp/client.py", line 1510, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiohttp/client.py", line 779, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiohttp/client.py", line 757, in _connect_and_send_request
+    await resp.start(conn)
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiohttp/client_reqrep.py", line 539, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiohttp/streams.py", line 703, in read
+    await self._waiter
+aiohttp.client_exceptions.ServerDisconnectedError: Server disconnected
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 320, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 164, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/error.py", line 27, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 58, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/fsm/middleware.py", line 43, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/dispatcher.py", line 283, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 189, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 161, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 153, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/router.py", line 181, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/telegram.py", line 126, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/dispatcher/event/handler.py", line 71, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/handlers/resident_handler.py", line 638, in resident_back
+    await message.answer("Главное меню:", reply_markup=main_menu_kb())
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/methods/base.py", line 82, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/bot.py", line 484, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/session/base.py", line 259, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1234/Desktop/EventsNow/.venv/lib/python3.13/site-packages/aiogram/client/session/aiohttp.py", line 176, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}")
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-01-10 11:12:10,761 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:12:10,762 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:12:11,082 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:12:13,725 - aiogram.event - INFO - Update id=605165833 is handled. Duration 2543 ms by bot id=8341383973
+2026-01-10 11:12:38,195 - aiogram.event - INFO - Update id=605165834 is handled. Duration 4703 ms by bot id=8341383973
+2026-01-10 11:12:58,532 - aiogram.event - INFO - Update id=605165835 is handled. Duration 9924 ms by bot id=8341383973
+2026-01-10 11:13:12,467 - aiogram.event - INFO - Update id=605165836 is handled. Duration 10309 ms by bot id=8341383973
+2026-01-10 11:13:14,783 - aiogram.event - INFO - Update id=605165837 is handled. Duration 9430 ms by bot id=8341383973
+2026-01-10 11:13:19,264 - aiogram.event - INFO - Update id=605165838 is handled. Duration 544 ms by bot id=8341383973
+2026-01-10 11:13:21,196 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:13:21,197 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:13:21,197 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:13:27,889 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:13:27,890 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:13:28,343 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:13:33,296 - aiogram.event - INFO - Update id=605165839 is handled. Duration 362 ms by bot id=8341383973
+2026-01-10 11:13:35,826 - aiogram.event - INFO - Update id=605165840 is handled. Duration 259 ms by bot id=8341383973
+2026-01-10 11:13:37,822 - aiogram.event - INFO - Update id=605165841 is handled. Duration 237 ms by bot id=8341383973
+2026-01-10 11:13:40,468 - aiogram.event - INFO - Update id=605165842 is handled. Duration 260 ms by bot id=8341383973
+2026-01-10 11:13:54,151 - aiogram.event - INFO - Update id=605165843 is handled. Duration 116 ms by bot id=8341383973
+2026-01-10 11:15:11,801 - aiogram.event - INFO - Update id=605165844 is handled. Duration 361 ms by bot id=8341383973
+2026-01-10 11:15:19,929 - aiogram.event - INFO - Update id=605165845 is handled. Duration 138 ms by bot id=8341383973
+2026-01-10 11:15:26,949 - aiogram.event - INFO - Update id=605165846 is handled. Duration 116 ms by bot id=8341383973
+2026-01-10 11:15:34,539 - aiogram.event - INFO - Update id=605165847 is handled. Duration 124 ms by bot id=8341383973
+2026-01-10 11:16:00,782 - aiogram.event - INFO - Update id=605165848 is handled. Duration 177 ms by bot id=8341383973
+2026-01-10 11:16:05,431 - aiogram.event - INFO - Update id=605165849 is handled. Duration 125 ms by bot id=8341383973
+2026-01-10 11:16:13,475 - aiogram.event - INFO - Update id=605165850 is handled. Duration 117 ms by bot id=8341383973
+2026-01-10 11:16:15,842 - aiogram.event - INFO - Update id=605165851 is handled. Duration 243 ms by bot id=8341383973
+2026-01-10 11:19:03,591 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:19:03,597 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:19:03,598 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:19:10,461 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:19:10,462 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:19:10,780 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:19:20,126 - aiogram.event - INFO - Update id=605165852 is handled. Duration 384 ms by bot id=8341383973
+2026-01-10 11:19:22,992 - aiogram.event - INFO - Update id=605165853 is handled. Duration 279 ms by bot id=8341383973
+2026-01-10 11:19:24,763 - aiogram.event - INFO - Update id=605165854 is handled. Duration 341 ms by bot id=8341383973
+2026-01-10 11:19:28,396 - aiogram.event - INFO - Update id=605165855 is handled. Duration 319 ms by bot id=8341383973
+2026-01-10 11:19:38,162 - aiogram.event - INFO - Update id=605165856 is handled. Duration 175 ms by bot id=8341383973
+2026-01-10 11:19:41,120 - aiogram.event - INFO - Update id=605165857 is handled. Duration 310 ms by bot id=8341383973
+2026-01-10 11:19:55,209 - aiogram.event - INFO - Update id=605165858 is handled. Duration 138 ms by bot id=8341383973
+2026-01-10 11:20:01,469 - aiogram.event - INFO - Update id=605165859 is handled. Duration 122 ms by bot id=8341383973
+2026-01-10 11:20:04,923 - aiogram.event - INFO - Update id=605165860 is handled. Duration 166 ms by bot id=8341383973
+2026-01-10 11:20:16,331 - aiogram.event - INFO - Update id=605165861 is handled. Duration 438 ms by bot id=8341383973
+2026-01-10 11:20:19,840 - aiogram.event - INFO - Update id=605165862 is handled. Duration 120 ms by bot id=8341383973
+2026-01-10 11:20:23,677 - aiogram.event - INFO - Update id=605165863 is handled. Duration 228 ms by bot id=8341383973
+2026-01-10 11:20:29,578 - aiogram.event - INFO - Update id=605165864 is handled. Duration 120 ms by bot id=8341383973
+2026-01-10 11:20:49,731 - aiogram.event - INFO - Update id=605165865 is handled. Duration 117 ms by bot id=8341383973
+2026-01-10 11:20:57,948 - aiogram.event - INFO - Update id=605165866 is handled. Duration 283 ms by bot id=8341383973
+2026-01-10 11:21:00,781 - aiogram.event - INFO - Update id=605165867 is handled. Duration 235 ms by bot id=8341383973
+2026-01-10 11:23:53,784 - aiogram.event - INFO - Update id=605165868 is handled. Duration 426 ms by bot id=8341383973
+2026-01-10 11:23:55,386 - aiogram.event - INFO - Update id=605165869 is handled. Duration 231 ms by bot id=8341383973
+2026-01-10 11:23:58,708 - aiogram.event - INFO - Update id=605165870 is handled. Duration 401 ms by bot id=8341383973
+2026-01-10 11:24:04,044 - aiogram.event - INFO - Update id=605165871 is handled. Duration 126 ms by bot id=8341383973
+2026-01-10 11:24:06,871 - aiogram.event - INFO - Update id=605165872 is handled. Duration 139 ms by bot id=8341383973
+2026-01-10 11:24:15,577 - aiogram.event - INFO - Update id=605165873 is handled. Duration 130 ms by bot id=8341383973
+2026-01-10 11:24:19,965 - aiogram.event - INFO - Update id=605165874 is handled. Duration 116 ms by bot id=8341383973
+2026-01-10 11:24:23,025 - aiogram.event - INFO - Update id=605165875 is handled. Duration 121 ms by bot id=8341383973
+2026-01-10 11:24:27,463 - aiogram.event - INFO - Update id=605165876 is handled. Duration 152 ms by bot id=8341383973
+2026-01-10 11:24:30,389 - aiogram.event - INFO - Update id=605165877 is handled. Duration 266 ms by bot id=8341383973
+2026-01-10 11:24:32,123 - aiogram.event - INFO - Update id=605165878 is handled. Duration 228 ms by bot id=8341383973
+2026-01-10 11:24:46,187 - aiogram.event - INFO - Update id=605165879 is handled. Duration 136 ms by bot id=8341383973
+2026-01-10 11:24:57,215 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:24:57,221 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:24:57,223 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:25:03,556 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:25:03,556 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:25:03,861 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:25:07,759 - aiogram.event - INFO - Update id=605165880 is handled. Duration 342 ms by bot id=8341383973
+2026-01-10 11:25:09,480 - aiogram.event - INFO - Update id=605165881 is handled. Duration 251 ms by bot id=8341383973
+2026-01-10 11:25:11,177 - aiogram.event - INFO - Update id=605165882 is handled. Duration 373 ms by bot id=8341383973
+2026-01-10 11:25:16,788 - aiogram.event - INFO - Update id=605165883 is handled. Duration 526 ms by bot id=8341383973
+2026-01-10 11:25:24,286 - aiogram.event - INFO - Update id=605165884 is handled. Duration 118 ms by bot id=8341383973
+2026-01-10 11:25:29,216 - aiogram.event - INFO - Update id=605165885 is handled. Duration 120 ms by bot id=8341383973
+2026-01-10 11:25:36,195 - aiogram.event - INFO - Update id=605165886 is handled. Duration 141 ms by bot id=8341383973
+2026-01-10 11:25:43,392 - aiogram.event - INFO - Update id=605165887 is handled. Duration 123 ms by bot id=8341383973
+2026-01-10 11:25:47,002 - aiogram.event - INFO - Update id=605165888 is handled. Duration 191 ms by bot id=8341383973
+2026-01-10 11:25:52,398 - aiogram.event - INFO - Update id=605165889 is handled. Duration 447 ms by bot id=8341383973
+2026-01-10 11:25:54,426 - aiogram.event - INFO - Update id=605165890 is handled. Duration 131 ms by bot id=8341383973
+2026-01-10 11:26:01,424 - aiogram.event - INFO - Update id=605165891 is handled. Duration 597 ms by bot id=8341383973
+2026-01-10 11:26:07,304 - aiogram.event - INFO - Update id=605165892 is handled. Duration 161 ms by bot id=8341383973
+2026-01-10 11:26:09,653 - aiogram.event - INFO - Update id=605165893 is handled. Duration 217 ms by bot id=8341383973
+2026-01-10 11:26:11,410 - aiogram.event - INFO - Update id=605165894 is handled. Duration 121 ms by bot id=8341383973
+2026-01-10 11:26:54,481 - aiogram.event - INFO - Update id=605165895 is handled. Duration 256 ms by bot id=8341383973
+2026-01-10 11:26:57,286 - aiogram.event - INFO - Update id=605165896 is handled. Duration 231 ms by bot id=8341383973
+2026-01-10 11:27:13,358 - aiogram.event - INFO - Update id=605165897 is handled. Duration 417 ms by bot id=8341383973
+2026-01-10 11:27:16,185 - aiogram.event - INFO - Update id=605165898 is handled. Duration 669 ms by bot id=8341383973
+2026-01-10 11:27:20,945 - aiogram.event - INFO - Update id=605165899 is handled. Duration 237 ms by bot id=8341383973
+2026-01-10 11:27:22,375 - aiogram.event - INFO - Update id=605165900 is handled. Duration 248 ms by bot id=8341383973
+2026-01-10 11:27:28,478 - aiogram.event - INFO - Update id=605165901 is handled. Duration 147 ms by bot id=8341383973
+2026-01-10 11:27:31,460 - aiogram.event - INFO - Update id=605165902 is handled. Duration 123 ms by bot id=8341383973
+2026-01-10 11:27:33,472 - aiogram.event - INFO - Update id=605165903 is handled. Duration 243 ms by bot id=8341383973
+2026-01-10 11:27:37,476 - aiogram.event - INFO - Update id=605165904 is handled. Duration 2268 ms by bot id=8341383973
+2026-01-10 11:27:41,258 - aiogram.event - INFO - Update id=605165905 is handled. Duration 1110 ms by bot id=8341383973
+2026-01-10 11:27:48,283 - aiogram.event - INFO - Update id=605165906 is handled. Duration 1163 ms by bot id=8341383973
+2026-01-10 11:28:46,337 - aiogram.event - INFO - Update id=605165907 is handled. Duration 990 ms by bot id=8341383973
+2026-01-10 11:28:50,338 - aiogram.event - INFO - Update id=605165908 is handled. Duration 249 ms by bot id=8341383973
+2026-01-10 11:28:54,924 - aiogram.event - INFO - Update id=605165909 is handled. Duration 531 ms by bot id=8341383973
+2026-01-10 11:33:18,604 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:33:18,635 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:33:18,636 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:33:24,615 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:33:24,615 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:33:24,939 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:33:36,671 - aiogram.event - INFO - Update id=605165910 is handled. Duration 340 ms by bot id=8341383973
+2026-01-10 11:33:38,623 - aiogram.event - INFO - Update id=605165911 is handled. Duration 342 ms by bot id=8341383973
+2026-01-10 11:33:41,357 - aiogram.event - INFO - Update id=605165912 is handled. Duration 1624 ms by bot id=8341383973
+2026-01-10 11:33:57,325 - aiogram.event - INFO - Update id=605165913 is handled. Duration 255 ms by bot id=8341383973
+2026-01-10 11:34:16,503 - aiogram.event - INFO - Update id=605165914 is handled. Duration 163 ms by bot id=8341383973
+2026-01-10 11:34:32,658 - aiogram.event - INFO - Update id=605165915 is handled. Duration 321 ms by bot id=8341383973
+2026-01-10 11:34:34,220 - aiogram.event - INFO - Update id=605165916 is handled. Duration 222 ms by bot id=8341383973
+2026-01-10 11:34:36,884 - aiogram.event - INFO - Update id=605165917 is handled. Duration 248 ms by bot id=8341383973
+2026-01-10 11:34:44,568 - aiogram.event - INFO - Update id=605165918 is handled. Duration 156 ms by bot id=8341383973
+2026-01-10 11:34:46,306 - aiogram.event - INFO - Update id=605165919 is handled. Duration 148 ms by bot id=8341383973
+2026-01-10 11:34:56,538 - aiogram.event - INFO - Update id=605165920 is handled. Duration 132 ms by bot id=8341383973
+2026-01-10 11:35:05,347 - aiogram.event - INFO - Update id=605165921 is handled. Duration 119 ms by bot id=8341383973
+2026-01-10 11:35:09,978 - aiogram.event - INFO - Update id=605165922 is handled. Duration 449 ms by bot id=8341383973
+2026-01-10 11:35:20,019 - aiogram.event - INFO - Update id=605165923 is handled. Duration 123 ms by bot id=8341383973
+2026-01-10 11:35:22,335 - aiogram.event - INFO - Update id=605165924 is handled. Duration 116 ms by bot id=8341383973
+2026-01-10 11:35:24,742 - aiogram.event - INFO - Update id=605165925 is handled. Duration 221 ms by bot id=8341383973
+2026-01-10 11:35:31,930 - aiogram.event - INFO - Update id=605165926 is handled. Duration 130 ms by bot id=8341383973
+2026-01-10 11:35:36,722 - aiogram.event - INFO - Update id=605165927 is handled. Duration 449 ms by bot id=8341383973
+2026-01-10 11:35:38,869 - aiogram.event - INFO - Update id=605165928 is handled. Duration 166 ms by bot id=8341383973
+2026-01-10 11:37:27,063 - aiogram.event - INFO - Update id=605165929 is handled. Duration 135 ms by bot id=8341383973
+2026-01-10 11:37:35,699 - aiogram.event - INFO - Update id=605165930 is handled. Duration 377 ms by bot id=8341383973
+2026-01-10 11:37:54,676 - aiogram.event - INFO - Update id=605165931 is handled. Duration 235 ms by bot id=8341383973
+2026-01-10 11:37:58,913 - aiogram.event - INFO - Update id=605165932 is handled. Duration 265 ms by bot id=8341383973
+2026-01-10 11:38:01,128 - aiogram.event - INFO - Update id=605165933 is handled. Duration 749 ms by bot id=8341383973
+2026-01-10 11:38:02,045 - aiogram.event - INFO - Update id=605165934 is handled. Duration 259 ms by bot id=8341383973
+2026-01-10 11:38:11,956 - aiogram.event - INFO - Update id=605165935 is handled. Duration 227 ms by bot id=8341383973
+2026-01-10 11:38:15,526 - aiogram.event - INFO - Update id=605165936 is handled. Duration 119 ms by bot id=8341383973
+2026-01-10 11:38:28,569 - aiogram.event - INFO - Update id=605165937 is handled. Duration 450 ms by bot id=8341383973
+2026-01-10 11:38:33,351 - aiogram.event - INFO - Update id=605165938 is handled. Duration 114 ms by bot id=8341383973
+2026-01-10 11:38:37,140 - aiogram.event - INFO - Update id=605165939 is handled. Duration 121 ms by bot id=8341383973
+2026-01-10 11:38:41,094 - aiogram.event - INFO - Update id=605165940 is handled. Duration 119 ms by bot id=8341383973
+2026-01-10 11:38:45,774 - aiogram.event - INFO - Update id=605165941 is handled. Duration 122 ms by bot id=8341383973
+2026-01-10 11:38:48,094 - aiogram.event - INFO - Update id=605165942 is handled. Duration 220 ms by bot id=8341383973
+2026-01-10 11:38:52,988 - aiogram.event - INFO - Update id=605165943 is handled. Duration 123 ms by bot id=8341383973
+2026-01-10 11:38:55,077 - aiogram.event - INFO - Update id=605165944 is handled. Duration 235 ms by bot id=8341383973
+2026-01-10 11:38:56,392 - aiogram.event - INFO - Update id=605165945 is handled. Duration 254 ms by bot id=8341383973
+2026-01-10 11:39:03,922 - aiogram.event - INFO - Update id=605165946 is handled. Duration 124 ms by bot id=8341383973
+2026-01-10 11:39:06,934 - aiogram.event - INFO - Update id=605165947 is handled. Duration 234 ms by bot id=8341383973
+2026-01-10 11:39:17,009 - aiogram.event - INFO - Update id=605165948 is handled. Duration 356 ms by bot id=8341383973
+2026-01-10 11:39:19,402 - aiogram.event - INFO - Update id=605165949 is handled. Duration 613 ms by bot id=8341383973
+2026-01-10 11:39:21,488 - aiogram.event - INFO - Update id=605165950 is handled. Duration 272 ms by bot id=8341383973
+2026-01-10 11:39:22,597 - aiogram.event - INFO - Update id=605165951 is handled. Duration 266 ms by bot id=8341383973
+2026-01-10 11:39:28,744 - aiogram.event - INFO - Update id=605165952 is handled. Duration 128 ms by bot id=8341383973
+2026-01-10 11:39:30,261 - aiogram.event - INFO - Update id=605165953 is handled. Duration 243 ms by bot id=8341383973
+2026-01-10 11:39:33,028 - aiogram.event - INFO - Update id=605165954 is handled. Duration 1390 ms by bot id=8341383973
+2026-01-10 11:39:35,442 - aiogram.event - INFO - Update id=605165955 is handled. Duration 759 ms by bot id=8341383973
+2026-01-10 11:39:43,932 - aiogram.event - INFO - Update id=605165956 is handled. Duration 1092 ms by bot id=8341383973
+2026-01-10 11:39:57,274 - aiogram.event - INFO - Update id=605165957 is handled. Duration 120 ms by bot id=8341383973
+2026-01-10 11:40:01,949 - aiogram.event - INFO - Update id=605165958 is handled. Duration 248 ms by bot id=8341383973
+2026-01-10 11:40:05,325 - aiogram.event - INFO - Update id=605165959 is handled. Duration 1770 ms by bot id=8341383973
+2026-01-10 11:40:08,051 - aiogram.event - INFO - Update id=605165960 is handled. Duration 1186 ms by bot id=8341383973
+2026-01-10 11:40:12,826 - aiogram.event - INFO - Update id=605165961 is handled. Duration 248 ms by bot id=8341383973
+2026-01-10 11:40:17,053 - aiogram.event - INFO - Update id=605165962 is handled. Duration 142 ms by bot id=8341383973
+2026-01-10 11:40:19,880 - aiogram.event - INFO - Update id=605165963 is handled. Duration 146 ms by bot id=8341383973
+2026-01-10 11:40:21,213 - aiogram.event - INFO - Update id=605165964 is not handled. Duration 7 ms by bot id=8341383973
+2026-01-10 11:40:27,070 - aiogram.event - INFO - Update id=605165965 is handled. Duration 235 ms by bot id=8341383973
+2026-01-10 11:40:29,156 - aiogram.event - INFO - Update id=605165966 is handled. Duration 234 ms by bot id=8341383973
+2026-01-10 11:40:31,635 - aiogram.event - INFO - Update id=605165967 is handled. Duration 431 ms by bot id=8341383973
+2026-01-10 11:40:39,798 - aiogram.event - INFO - Update id=605165968 is handled. Duration 151 ms by bot id=8341383973
+2026-01-10 11:40:41,588 - aiogram.event - INFO - Update id=605165969 is handled. Duration 326 ms by bot id=8341383973
+2026-01-10 11:40:45,419 - aiogram.event - INFO - Update id=605165970 is handled. Duration 164 ms by bot id=8341383973
+2026-01-10 11:40:56,125 - aiogram.event - INFO - Update id=605165971 is handled. Duration 141 ms by bot id=8341383973
+2026-01-10 11:41:00,289 - aiogram.event - INFO - Update id=605165972 is handled. Duration 126 ms by bot id=8341383973
+2026-01-10 11:41:03,093 - aiogram.event - INFO - Update id=605165973 is handled. Duration 125 ms by bot id=8341383973
+2026-01-10 11:41:12,798 - aiogram.event - INFO - Update id=605165974 is handled. Duration 127 ms by bot id=8341383973
+2026-01-10 11:41:15,952 - aiogram.event - INFO - Update id=605165975 is handled. Duration 170 ms by bot id=8341383973
+2026-01-10 11:41:21,978 - aiogram.event - INFO - Update id=605165976 is handled. Duration 282 ms by bot id=8341383973
+2026-01-10 11:41:28,073 - aiogram.event - INFO - Update id=605165977 is handled. Duration 126 ms by bot id=8341383973
+2026-01-10 11:41:29,824 - aiogram.event - INFO - Update id=605165978 is handled. Duration 250 ms by bot id=8341383973
+2026-01-10 11:41:31,691 - aiogram.event - INFO - Update id=605165979 is handled. Duration 153 ms by bot id=8341383973
+2026-01-10 11:41:40,715 - aiogram.event - INFO - Update id=605165980 is handled. Duration 127 ms by bot id=8341383973
+2026-01-10 11:41:43,265 - aiogram.event - INFO - Update id=605165981 is handled. Duration 306 ms by bot id=8341383973
+2026-01-10 11:41:46,721 - aiogram.event - INFO - Update id=605165982 is handled. Duration 368 ms by bot id=8341383973
+2026-01-10 11:41:50,562 - aiogram.event - INFO - Update id=605165983 is handled. Duration 897 ms by bot id=8341383973
+2026-01-10 11:41:54,264 - aiogram.event - INFO - Update id=605165984 is handled. Duration 571 ms by bot id=8341383973
+2026-01-10 11:41:55,574 - aiogram.event - INFO - Update id=605165985 is handled. Duration 239 ms by bot id=8341383973
+2026-01-10 11:42:11,310 - aiogram.event - INFO - Update id=605165986 is handled. Duration 505 ms by bot id=8341383973
+2026-01-10 11:42:12,695 - aiogram.event - INFO - Update id=605165987 is handled. Duration 373 ms by bot id=8341383973
+2026-01-10 11:42:16,085 - aiogram.event - INFO - Update id=605165988 is handled. Duration 1959 ms by bot id=8341383973
+2026-01-10 11:42:18,556 - aiogram.event - INFO - Update id=605165989 is handled. Duration 1015 ms by bot id=8341383973
+2026-01-10 11:42:24,003 - aiogram.event - INFO - Update id=605165990 is handled. Duration 707 ms by bot id=8341383973
+2026-01-10 11:45:12,597 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:45:12,631 - aiogram.dispatcher - INFO - Polling stopped for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:45:12,634 - aiogram.dispatcher - INFO - Polling stopped
+2026-01-10 11:45:12,726 - aiogram.dispatcher - WARNING - Received SIGINT signal
+2026-01-10 11:46:35,645 - eventsnow - INFO - 🤖 EventsNow started
+2026-01-10 11:46:35,647 - aiogram.dispatcher - INFO - Start polling
+2026-01-10 11:46:35,965 - aiogram.dispatcher - INFO - Run polling for bot @Events_Now_bot id=8341383973 - 'EventsNow'
+2026-01-10 11:46:43,863 - aiogram.event - INFO - Update id=605165991 is handled. Duration 350 ms by bot id=8341383973
+2026-01-10 11:46:48,158 - aiogram.event - INFO - Update id=605165992 is handled. Duration 269 ms by bot id=8341383973
+2026-01-10 11:46:53,085 - aiogram.event - INFO - Update id=605165993 is handled. Duration 3186 ms by bot id=8341383973
+2026-01-10 11:47:06,172 - aiogram.event - INFO - Update id=605165994 is handled. Duration 1948 ms by bot id=8341383973
+2026-01-10 11:47:44,456 - aiogram.event - INFO - Update id=605165995 is handled. Duration 445 ms by bot id=8341383973
+2026-01-10 11:47:46,253 - aiogram.event - INFO - Update id=605165996 is handled. Duration 243 ms by bot id=8341383973
+2026-01-10 11:47:50,853 - aiogram.event - INFO - Update id=605165997 is handled. Duration 2857 ms by bot id=8341383973
+2026-01-10 11:47:53,937 - aiogram.event - INFO - Update id=605165998 is handled. Duration 129 ms by bot id=8341383973
+2026-01-10 11:47:55,688 - aiogram.event - INFO - Update id=605165999 is handled. Duration 572 ms by bot id=8341383973
+2026-01-10 11:47:57,985 - aiogram.event - INFO - Update id=605166000 is handled. Duration 227 ms by bot id=8341383973
+2026-01-10 11:48:05,656 - aiogram.event - INFO - Update id=605166001 is handled. Duration 137 ms by bot id=8341383973
+2026-01-10 11:48:06,846 - aiogram.event - INFO - Update id=605166002 is handled. Duration 275 ms by bot id=8341383973
+2026-01-10 11:48:11,384 - aiogram.event - INFO - Update id=605166003 is handled. Duration 3231 ms by bot id=8341383973
+2026-01-10 11:48:16,991 - aiogram.event - INFO - Update id=605166004 is handled. Duration 2659 ms by bot id=8341383973
+2026-01-10 11:50:58,580 - aiogram.event - INFO - Update id=605166005 is handled. Duration 162 ms by bot id=8341383973
+2026-01-10 11:51:00,829 - aiogram.event - INFO - Update id=605166006 is not handled. Duration 6 ms by bot id=8341383973

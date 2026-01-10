@@ -20,8 +20,8 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-
 # ---------- ENUMs ----------
+
 class EventCategory(str, PyEnum):
     EXHIBITION = "EXHIBITION"
     MASTERCLASS = "MASTERCLASS"
@@ -29,7 +29,6 @@ class EventCategory(str, PyEnum):
     PERFORMANCE = "PERFORMANCE"
     LECTURE = "LECTURE"
     OTHER = "OTHER"
-
 
 class EventStatus(str, PyEnum):
     DRAFT = "draft"
@@ -39,52 +38,54 @@ class EventStatus(str, PyEnum):
     ARCHIVED = "archived"
     REJECTED = "rejected"
 
-
 class PaymentStatus(str, PyEnum):
     PENDING = "pending"
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
 
-
 class PricingModel(str, PyEnum):
     DAILY = "daily"
     PERIOD = "period"
-
 
 class UserRole(str, PyEnum):
     RESIDENT = "resident"
     ORGANIZER = "organizer"
     ADMIN = "admin"
 
-
 class CityStatus(str, PyEnum):
     ACTIVE = "active"
     COMING_SOON = "coming_soon"
 
-
 # ---------- User ----------
+
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
+
     username = Column(String(255), nullable=True)
     first_name = Column(String(255), nullable=True)
     last_name = Column(String(255), nullable=True)
     phone = Column(String(20), nullable=True)
+
     role = Column(SQLEnum(UserRole), default=UserRole.RESIDENT)
     city_slug = Column(String(50), default="nojabrsk")
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # NEW: активность для статистики
+    last_seen_at = Column(DateTime, nullable=True)
 
     # relationships
     events = relationship("Event", back_populates="organizer")
     payments = relationship("Payment", back_populates="organizer")
     comments = relationship("Comment", back_populates="user")
 
-
 # ---------- City ----------
+
 class City(Base):
     __tablename__ = "cities"
 
@@ -94,15 +95,15 @@ class City(Base):
     status = Column(SQLEnum(CityStatus), default=CityStatus.ACTIVE)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-
 # ---------- Event ----------
+
 class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, ForeignKey("users.telegram_id"), nullable=False)
-    city_slug = Column(String(50), nullable=False)
 
+    city_slug = Column(String(50), nullable=False)
     title = Column(String(255), nullable=False)
     category = Column(SQLEnum(EventCategory), nullable=False)
     description = Column(Text)
@@ -120,7 +121,6 @@ class Event(Base):
     # visitor pricing (tiers / misc)
     admission_price_json = Column(Text, nullable=True)  # JSON str: {"дети":300,"взрослые":600}
     free_kids_upto_age = Column(Integer, nullable=True)
-
     reject_reason = Column(Text, nullable=True)
 
     # DAILY
@@ -162,8 +162,8 @@ class Event(Base):
         order_by="EventPhoto.position.asc()",
     )
 
-
 # ---------- EventPhoto (NEW) ----------
+
 class EventPhoto(Base):
     __tablename__ = "event_photos"
 
@@ -175,6 +175,7 @@ class EventPhoto(Base):
 
     # 1..5
     position = Column(Integer, nullable=False, default=1)
+
     created_at = Column(DateTime, default=datetime.utcnow)
 
     event = relationship("Event", back_populates="photos")
@@ -183,8 +184,8 @@ class EventPhoto(Base):
         UniqueConstraint("event_id", "position", name="uq_event_photos_event_pos"),
     )
 
-
 # ---------- Payment ----------
+
 class Payment(Base):
     __tablename__ = "payments"
 
@@ -218,8 +219,8 @@ class Payment(Base):
     organizer = relationship("User", back_populates="payments")
     event = relationship("Event", back_populates="payment")
 
-
 # ---------- Comment ----------
+
 class Comment(Base):
     __tablename__ = "comments"
 
@@ -229,14 +230,15 @@ class Comment(Base):
 
     text = Column(Text, nullable=False)
     rating = Column(Integer, nullable=True)  # 1-5
+
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # relationships
     event = relationship("Event", back_populates="comments")
     user = relationship("User", back_populates="comments")
 
-
 # ---------- Favorite ----------
+
 class Favorite(Base):
     __tablename__ = "favorites"
 
@@ -247,8 +249,8 @@ class Favorite(Base):
     # relationships
     event = relationship("Event", back_populates="favorites")
 
-
 # ---------- Feedback ----------
+
 class Feedback(Base):
     __tablename__ = "feedback"
 
