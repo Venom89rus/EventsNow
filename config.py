@@ -15,9 +15,9 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./eventsnow.db")
 # CITIES
 CITIES = {
     "nojabrsk": {"name": "Ноябрьск", "status": "active"},
-    "muravlenko": {"name": "Муравленко", "status": "coming_soon"},
-    "gubkinskiy": {"name": "Губкинский", "status": "coming_soon"},
-    "novy_urengoy": {"name": "Новый Уренгой", "status": "coming_soon"},
+    # "muravlenko": {"name": "Муравленко", "status": "coming_soon"},
+    # "gubkinskiy": {"name": "Губкинский", "status": "coming_soon"},
+    # "novy_urengoy": {"name": "Новый Уренгой", "status": "coming_soon"},
 }
 
 DEFAULT_CITY = os.getenv("DEFAULT_CITY", "nojabrsk")

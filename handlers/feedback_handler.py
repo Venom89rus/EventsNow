@@ -21,7 +21,7 @@ def main_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🏠 Житель"), KeyboardButton(text="🎪 Организатор")],
-            [KeyboardButton(text="📞 Обратная связь"), KeyboardButton(text="🛡 Админ")],
+            [KeyboardButton(text="📞 Обратная связь")],
         ],
         resize_keyboard=True,
     )
