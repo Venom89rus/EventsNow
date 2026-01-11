@@ -175,7 +175,7 @@ def organizer_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🎪 Организатор")],
-            [KeyboardButton(text="⬅️ Назад"), KeyboardButton(text="📊 Статистика")],
+            [KeyboardButton(text="⬅️ Назад"), KeyboardButton(text="📈 Активность")],
         ],
         resize_keyboard=True,
     )
@@ -266,7 +266,12 @@ class OrganizerEvent(StatesGroup):
 # -------- Menu actions --------
 
 @router.message(F.text == "⬅️ Назад")
-async def organizer_back(message: Message, state: FSMContext):
+async def organizer_back_message(message: Message, state: FSMContext):
+    # --- GUARD: не перехватываем админский "Назад" ---
+    st = await state.get_state()
+    if message.from_user and (message.from_user.id in ADMIN_IDS) and st and ("AdminState" in st):
+        return
+
     await state.clear()
     await touch_user(
         telegram_id=message.from_user.id,
@@ -277,8 +282,14 @@ async def organizer_back(message: Message, state: FSMContext):
     await message.answer("Главное меню:", reply_markup=main_menu_kb())
 
 
-@router.message(F.text == "📊 Статистика")
-async def organizer_stats(message: Message):
+@router.message(F.text == "📈 Активность")
+async def organizer_activity_message(message: Message, state: FSMContext):
+    # --- GUARD: не перехватываем админскую статистику ---
+    st = await state.get_state()
+    if message.from_user and (message.from_user.id in ADMIN_IDS) and st and ("AdminState" in st):
+        return
+
+    # --- дальше твоя текущая фича статистики организатора (оставляем смысл) ---
     await touch_user(
         telegram_id=message.from_user.id,
         username=message.from_user.username,
@@ -288,14 +299,13 @@ async def organizer_stats(message: Message):
 
     s = await get_global_user_stats()
     text = (
-        "<b>📊 Статистика</b>\n\n"
-        f"👥 Всего пользователей: <b>{s['total_users']}</b>\n"
-        f"🆕 Новых за сегодня: <b>{s['new_today']}</b>\n"
-        f"✅ Активных за 7 дней: <b>{s['active_7d']}</b>\n"
-        f"✅ Активных за 30 дней: <b>{s['active_30d']}</b>\n"
+        "<b>📈 Активность</b>\n\n"
+        f"👥 Всего пользователей: <b>{s.get('total_users', 0)}</b>\n"
+        f"🆕 Новых за сегодня: <b>{s.get('new_today', 0)}</b>\n"
+        f"✅ Активных за 7 дней: <b>{s.get('active_7d', 0)}</b>\n"
+        f"✅ Активных за 30 дней: <b>{s.get('active_30d', 0)}</b>\n"
     )
     await message.answer(text, parse_mode="HTML", reply_markup=organizer_menu_kb())
-
 
 @router.message(F.text == "🎪 Организатор")
 async def organizer_entry(message: Message, state: FSMContext):
@@ -559,6 +569,7 @@ async def organizer_admission_price(message: Message, state: FSMContext):
         parse_mode="HTML",
         reply_markup=yes_no_kb("org_free_kids:yes", "org_free_kids:no"),
     )
+
 
 
 @router.callback_query(F.data == "org_free_kids:no", OrganizerEvent.free_kids_question)

@@ -1,13 +1,24 @@
 from datetime import datetime
+
 from sqlalchemy import select
 
 from database.session import get_db
 from database.models import User
 
-async def touch_user(telegram_id: int, username: str | None, first_name: str | None, last_name: str | None) -> None:
+
+async def touch_user(
+    telegram_id: int,
+    username: str | None,
+    first_name: str | None,
+    last_name: str | None,
+) -> None:
     now = datetime.utcnow()
+
     async with get_db() as db:
-        u = (await db.execute(select(User).where(User.telegram_id == telegram_id))).scalar_one_or_none()
+        u = (
+            await db.execute(select(User).where(User.telegram_id == telegram_id))
+        ).scalar_one_or_none()
+
         if not u:
             db.add(
                 User(
