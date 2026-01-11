@@ -1,6 +1,7 @@
 import html
 import json
 from datetime import datetime, date as ddate
+from sqlalchemy import select, delete
 
 from aiogram import Router, F
 from aiogram.types import (
@@ -14,7 +15,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from sqlalchemy import select
+
 
 from config import ADMIN_IDS, CITIES, DEFAULT_CITY
 from services.payment_service import calculate_price, PricingError
@@ -697,6 +698,11 @@ async def organizer_confirm(callback: CallbackQuery, state: FSMContext):
         return
 
     data = await state.get_data()
+    if data.get("_confirm_in_progress"):
+        await callback.answer("Уже отправляется…", show_alert=True)
+        return
+    await state.update_data(_confirm_in_progress=True)
+
     tg_user = callback.from_user
 
     city_slug = data["city_slug"]
@@ -774,6 +780,7 @@ async def organizer_confirm(callback: CallbackQuery, state: FSMContext):
             payment_status=PaymentStatus.PENDING,
         )
 
+        # оставляем совместимость как было (через hasattr)
         if hasattr(ev, "admission_price_json"):
             ev.admission_price_json = admission_price_json
         if hasattr(ev, "free_kids_upto_age"):
@@ -784,6 +791,11 @@ async def organizer_confirm(callback: CallbackQuery, state: FSMContext):
         db.add(ev)
         await db.flush()  # получить ev.id
         event_id = ev.id
+
+        # FIX: делаем вставку фото идемпотентной (не меняя фичи)
+        # Если по какой-то причине фотки на этот event_id уже есть — удаляем и вставляем заново.
+        await db.execute(delete(EventPhoto).where(EventPhoto.event_id == event_id))
+        await db.flush()  # важно: применить DELETE до INSERT-ов
 
         # сохраняем фото (до 5)
         for i, fid in enumerate(photo_ids[:5], start=1):
@@ -835,6 +847,7 @@ async def organizer_confirm(callback: CallbackQuery, state: FSMContext):
         reply_markup=organizer_menu_kb(),
     )
     await callback.answer()
+
 
 @router.callback_query(F.data == "org_photos:pop", OrganizerEvent.photos)
 async def organizer_photos_pop(callback: CallbackQuery, state: FSMContext):
