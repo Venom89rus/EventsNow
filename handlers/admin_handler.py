@@ -1,6 +1,9 @@
 import html
 import logging
 from datetime import datetime
+import asyncio
+from services.notify_service import notify_new_event_published
+
 
 from aiogram import Router, F
 from aiogram.types import (
@@ -33,6 +36,7 @@ from database.models import (
 )
 from services.stats_service import get_global_user_stats
 from services.user_activity import touch_user
+
 
 router = Router()
 logger = logging.getLogger("eventsnow")
@@ -540,7 +544,9 @@ async def organizer_pay_test(callback: CallbackQuery):
     event_id = int(callback.data.split(":", 1)[1])
 
     async with get_db() as db:
-        event = (await db.execute(select(Event).where(Event.id == event_id))).scalar_one_or_none()
+        event = (
+            await db.execute(select(Event).where(Event.id == event_id))
+        ).scalar_one_or_none()
         if not event:
             await callback.answer("Заявка не найдена", show_alert=True)
             return
@@ -555,36 +561,54 @@ async def organizer_pay_test(callback: CallbackQuery):
             return
 
         existing_payment = (
-            (await db.execute(select(Payment).where(Payment.event_id == event.id)))
-            .scalar_one_or_none()
-        )
+            await db.execute(select(Payment).where(Payment.event_id == event.id))
+        ).scalar_one_or_none()
 
         if existing_payment and existing_payment.status == PaymentStatus.COMPLETED:
             event.payment_status = PaymentStatus.COMPLETED
             event.status = EventStatus.ACTIVE
-            await callback.message.answer("⚠️ Уже оплачено ранее, мероприятие опубликовано.", parse_mode="HTML")
-            await callback.answer()
-            return
+            await db.commit()
+            eid = event.id
+            city = event.city_slug
+        else:
+            p = Payment(
+                user_id=event.user_id,
+                event_id=event.id,
+                category=event.category,
+                pricing_model=(
+                    PricingModel.PERIOD
+                    if (event.period_start and event.period_end)
+                    else PricingModel.DAILY
+                ),
+                amount=0.0,
+                status=PaymentStatus.COMPLETED,
+                payment_system="test",
+                completed_at=datetime.utcnow(),
+            )
+            db.add(p)
 
-        p = Payment(
-            user_id=event.user_id,
-            event_id=event.id,
-            category=event.category,
-            pricing_model=PricingModel.PERIOD if (event.period_start and event.period_end) else PricingModel.DAILY,
-            amount=0.0,
-            status=PaymentStatus.COMPLETED,
-            payment_system="test",
-            completed_at=datetime.utcnow(),
-        )
-        db.add(p)
+            event.payment_status = PaymentStatus.COMPLETED
+            event.status = EventStatus.ACTIVE
 
-        event.payment_status = PaymentStatus.COMPLETED
-        event.status = EventStatus.ACTIVE
+            await db.commit()
+            eid = event.id
+            city = event.city_slug
 
+    # пользовательское сообщение
     await callback.message.answer(
         "✅ Оплата подтверждена (тест).\nМероприятие опубликовано в ленте города.",
         parse_mode="HTML",
     )
+
+    # уведомления жителям
+    try:
+        logger.warning("NOTIFY: TRY event_id=%s city=%s", eid, city)
+        await asyncio.sleep(0.2)
+        res = await notify_new_event_published(callback.bot, eid)
+        logger.warning("NOTIFY: RESULT event_id=%s res=%s", eid, res)
+    except Exception as e:
+        logger.exception("NOTIFY: ERROR event_id=%s error=%r", eid, e)
+
     await callback.answer()
 
 
