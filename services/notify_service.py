@@ -7,6 +7,7 @@ from sqlalchemy import select
 from database.session import get_db
 from database.models import User, Event, EventStatus, EventPhoto
 import logging
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 logger = logging.getLogger(__name__)
 
@@ -71,19 +72,43 @@ def _event_time_text(event: Event) -> str:
         return "Весь день"
 
 def _event_price_text(event: Event) -> str:
-    """Форматирует цену"""
-    # ✅ ФИКС 2: json.loads() + try/except
-    if event.admission_price_json:
+    """Возвращает цену одной строкой: '2000 ₽' или 'Бесплатно'"""
+    raw = getattr(event, "admission_price_json", None)
+
+    if raw:
         try:
-            prices = json.loads(event.admission_price_json)  # ✅ парсим JSON строку
-            if prices.get('все'):
-                return f"💰 {prices['все']} ₽"
-            elif prices.get('дети'):
-                return f"👶 {prices['дети']} ₽ / взрослые по ценам"
-            return "💰 по ценам"
-        except (json.JSONDecodeError, AttributeError, KeyError):
-            return "💰 уточняйте"  # fallback
-    return "🎁 бесплатно"
+            prices = json.loads(raw)
+
+            # admission_price_json иногда может быть строкой -> тогда это не dict
+            if isinstance(prices, dict):
+                # приоритет: все -> взрослые -> вход -> дети
+                for key in ("все", "взрослые", "вход", "дети"):
+                    v = prices.get(key)
+                    if v is None:
+                        continue
+                    try:
+                        v = float(v)
+                    except Exception:
+                        return "Уточняйте"
+
+                    # "только цифра"
+                    s = str(int(v)) if v.is_integer() else str(v)
+                    return f"{s} ₽"
+
+        except Exception:
+            return "Уточняйте"
+
+    # fallback на обычную цену, если она есть
+    v = getattr(event, "price_admission", None)
+    if v is None:
+        return "Бесплатно"
+
+    try:
+        v = float(v)
+        s = str(int(v)) if v.is_integer() else str(v)
+        return f"{s} ₽"
+    except Exception:
+        return "Уточняйте"
 
 def _event_push_text(event: Event) -> str:
     """Форматирует текст уведомления"""
@@ -166,6 +191,18 @@ async def notify_new_event_published(
             logger.warning("NOTIFY skip organizer uid=%s", uid)
             skipped += 1
             continue
+
+        kb = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(
+                text="👉 Посмотреть",
+                url=f"https://t.me/Events_Now_bot?start=app_event_{event_id}"
+            )
+        ]])
+
+        if file_id:
+            await bot.send_photo(chat_id=uid, photo=file_id, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await bot.send_message(chat_id=uid, text=text, parse_mode="HTML", reply_markup=kb)
 
         try:
             if file_id:

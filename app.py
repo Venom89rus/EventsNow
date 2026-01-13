@@ -20,20 +20,24 @@ from handlers.resident_handler import router as resident_router  # noqa: E402
 from handlers.organizer_handler import router as organizer_router  # noqa: E402
 from handlers.feedback_handler import router as feedback_router  # noqa: E402
 from services.event_archive import archive_expired_events  # noqa: E402
-from handlers.admin_tools_handler import router as admin_tools_router
 
 os.makedirs("logs", exist_ok=True)
 
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("logs/bot.log"), logging.StreamHandler()],
+    handlers=[
+        logging.FileHandler("logs/bot.log"),
+        logging.StreamHandler(),
+    ],
 )
 
 
 async def main():
+    """Инициализация и запуск бота"""
     await init_db()
 
+    # Архивируем истекшие события
     try:
         n = await archive_expired_events()
         if n > 0:
@@ -41,6 +45,7 @@ async def main():
     except Exception as e:
         logger.exception("Archive job failed: %s", e)
 
+    # Создаём бот и диспетчер
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
 
@@ -49,16 +54,16 @@ async def main():
         logger.exception("UNHANDLED_ERROR event=%r exception=%r", event, exception)
         return True
 
-    # Критично: админ-роутер должен быть раньше, иначе его кнопки перехватывают resident/organizer.
+    # **ПОРЯДОК ИМЕЕТ ЗНАЧЕНИЕ:** админ должен быть до resident/organizer
+    # чтобы его кнопки не перехватывались
     dp.include_router(start_router)
     dp.include_router(admin_router)
-    dp.include_router(admin_tools_router)
     dp.include_router(resident_router)
     dp.include_router(organizer_router)
     dp.include_router(feedback_router)
 
-
     logger.info("🤖 EventsNow started")
+
     await dp.start_polling(bot)
 
 
