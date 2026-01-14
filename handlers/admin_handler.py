@@ -429,7 +429,7 @@ async def admin_view(callback: CallbackQuery):
             f"📍 Где: {h(e.location)}\n"
             f"💳 Цена: {h(fmt_price(e))}\n"
             f"📞 Тел: {h(e.contact_phone or '—')}\n"
-            f"✉️ Email: {h(e.contact_email or '—')}\n"
+ #           f"✉️ Email: {h(e.contact_email or '—')}\n"
             f"👤 Организатор: {e.user_id}\n"
             f"🧾 Статус: {h(fmt_status(e))}\n\n"
             f"📝 Описание:\n{h(compact(e.description) or '—')}"

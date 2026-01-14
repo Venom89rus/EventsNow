@@ -174,7 +174,7 @@ def event_card_text_full(e: Event) -> str:
         f"📍 Где: {h(e.location)}\n"
         f"💳 Цена: {h(fmt_price(e))}\n"
         f"📞 Тел: {h(e.contact_phone or '—')}\n"
-        f"✉️ Email: {h(e.contact_email or '—')}\n"
+ #       f"✉️ Email: {h(e.contact_email or '—')}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
         f"📝 <b>ПОЛНОЕ ОПИСАНИЕ:</b>\n{h(compact(e.description) or '—')}"
     )
