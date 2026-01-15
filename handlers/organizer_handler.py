@@ -158,6 +158,16 @@ def _parse_tier_prices(text: str, allowed_keys: list[str]) -> dict:
 
 
 # -------- Keyboards --------
+def organizer_city_choice_kb() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="✅ Ноябрьск"), KeyboardButton(text="🏙 Муравленко")],
+            [KeyboardButton(text="🏙 Губкинский"), KeyboardButton(text="🏙 Новый Уренгой")],
+            [KeyboardButton(text="⬅️ Назад")],
+        ],
+        resize_keyboard=True,
+    )
+
 
 def main_menu_kb() -> ReplyKeyboardMarkup:
     # Главное меню (без импорта из start_handler/resident_handler -> нет циклических импортов)
@@ -329,10 +339,58 @@ async def organizer_entry(message: Message, state: FSMContext):
         reply_markup=organizer_menu_kb(),
         parse_mode="HTML",
     )
-    await message.answer("Города:", reply_markup=cities_kb_for_organizer(), parse_mode="HTML")
+    await message.answer(
+        "Выбери город:",
+        reply_markup=organizer_city_choice_kb(),
+        parse_mode="HTML",
+    )
 
 
 # -------- Flow --------
+ORG_CITY_TEXT_TO_SLUG = {
+    "✅ Ноябрьск": "nojabrsk",
+    "🏙 Муравленко": "muravlenko",
+    "🏙 Губкинский": "gubkinskiy",
+    "🏙 Новый Уренгой": "novy_urengoy",
+}
+
+@router.message(OrganizerEvent.city, F.text.in_(set(ORG_CITY_TEXT_TO_SLUG.keys())))
+async def organizer_choose_city_from_bottom(message: Message, state: FSMContext):
+    await touch_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
+    slug = ORG_CITY_TEXT_TO_SLUG.get(message.text)
+    if not slug:
+        await message.answer("Выбери город кнопками ниже.", reply_markup=organizer_city_choice_kb())
+        return
+
+    info = CITIES.get(slug)
+    if not info:
+        await message.answer("Город не найден.", reply_markup=organizer_city_choice_kb())
+        return
+
+    # Ноябрьск — рабочий, идём дальше как в callback
+    if slug == "nojabrsk":
+        await state.update_data(city_slug=slug, city_name=info.get("name"))
+        await state.set_state(OrganizerEvent.category)
+        await message.answer(
+            f"<b>{h(info.get('name'))}</b> выбран!",
+            reply_markup=categories_kb(),
+            parse_mode="HTML",
+        )
+        return
+
+    # Остальные — заглушка
+    await message.answer(
+        f"{h(info.get('name'))} — раздел в разработке.",
+        reply_markup=organizer_city_choice_kb(),
+        parse_mode="HTML",
+    )
+
 
 @router.callback_query(F.data.startswith("org_city:"), OrganizerEvent.city)
 async def organizer_city(callback: CallbackQuery, state: FSMContext):

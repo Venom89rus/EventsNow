@@ -137,6 +137,16 @@ def resident_menu_kb() -> ReplyKeyboardMarkup:
         resize_keyboard=True,
     )
 
+def city_choice_kb() -> ReplyKeyboardMarkup:
+    """Нижняя клавиатура выбора города (пока 4 города)"""
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="✅ Ноябрьск"), KeyboardButton(text="🏙 Муравленко")],
+            [KeyboardButton(text="🏙 Губкинский"), KeyboardButton(text="🏙 Новый Уренгой")],
+            [KeyboardButton(text="⬅️ Назад")],
+        ],
+        resize_keyboard=True,
+    )
 
 
 def period_kb() -> ReplyKeyboardMarkup:
@@ -659,7 +669,11 @@ async def resident_entry(message: Message, state: FSMContext):
         reply_markup=resident_menu_kb(),
         parse_mode="HTML",
     )
-    await message.answer("Выбери город:", reply_markup=cities_keyboard(page=0), parse_mode="HTML")
+    await message.answer(
+        "Выбери город:",
+        reply_markup=city_choice_kb(),
+        parse_mode="HTML",
+    )
 
 
 @router.callback_query(F.data.startswith("res_page:"))
@@ -667,6 +681,41 @@ async def resident_page_cb(callback: CallbackQuery):
     page = int(callback.data.split(":")[1])
     await callback.message.edit_reply_markup(reply_markup=cities_keyboard(page=page))
     await callback.answer()
+
+
+CITY_TEXT_TO_SLUG = {
+    "✅ Ноябрьск": "nojabrsk",
+    "🏙 Муравленко": "muravlenko",
+    "🏙 Губкинский": "gubkinskiy",
+    "🏙 Новый Уренгой": "novy_urengoy",
+}
+
+@router.message(ResidentState.choosing_city, F.text.in_(set(CITY_TEXT_TO_SLUG.keys())))
+async def resident_choose_city_from_bottom(message: Message, state: FSMContext):
+    await _touch_from_message(message)
+
+    slug = CITY_TEXT_TO_SLUG.get(message.text)
+    if not slug:
+        await message.answer("Выбери город кнопками ниже.", reply_markup=city_choice_kb())
+        return
+
+    # Ноябрьск — рабочий
+    if slug == "nojabrsk":
+        await state.set_state(ResidentState.choosing_period)
+        await state.update_data(city_slug=slug, mode=None, category=None)
+
+        city_name = (CITIES.get(slug) or {}).get("name", slug)
+        await message.answer(f"{h(city_name)} выбран!", parse_mode="HTML")
+        await message.answer("Выберите период:", reply_markup=period_kb(), parse_mode="HTML")
+        return
+
+    # Остальные города — заглушка
+    city_name = (CITIES.get(slug) or {}).get("name", slug)
+    await message.answer(
+        f"{h(city_name)} — раздел в разработке.",
+        parse_mode="HTML",
+        reply_markup=city_choice_kb(),
+    )
 
 
 @router.callback_query(F.data.startswith("res_city:"))
@@ -819,7 +868,7 @@ async def resident_back(message: Message, state: FSMContext):
     # Если уже на выборе периода — возвращаем на выбор города (не в главное меню)
     if cur == ResidentState.choosing_period.state:
         await state.set_state(ResidentState.choosing_city)
-        await message.answer("Выбери город:", reply_markup=cities_keyboard(page=0), parse_mode="HTML")
+        await message.answer("Выбери город:", reply_markup=city_choice_kb(), parse_mode="HTML")
         return
 
     # Во всех остальных случаях (не Житель-флоу) — как было: в главное меню
