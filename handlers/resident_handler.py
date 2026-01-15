@@ -706,7 +706,7 @@ async def resident_choose_city_from_bottom(message: Message, state: FSMContext):
 
         city_name = (CITIES.get(slug) or {}).get("name", slug)
         await message.answer(f"{h(city_name)} выбран!", parse_mode="HTML")
-        await message.answer("Выберите период:", reply_markup=period_kb(), parse_mode="HTML")
+        await message.answer("Выберите период проведения мероприятия:", reply_markup=period_kb(), parse_mode="HTML")
         return
 
     # Остальные города — заглушка
