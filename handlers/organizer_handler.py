@@ -212,6 +212,17 @@ def categories_kb() -> InlineKeyboardMarkup:
     kb.adjust(2)
     return kb.as_markup()
 
+def organizer_categories_choice_kb() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🖼 Выставка"), KeyboardButton(text="🧑‍🏫🏛 Мастер-класс")],
+            [KeyboardButton(text="🎤 Концерт"), KeyboardButton(text="🎭 Выступление")],
+            [KeyboardButton(text="🎓 Лекция/семинар"), KeyboardButton(text="✨ Другое")],
+            [KeyboardButton(text="⬅️ Назад")],
+        ],
+        resize_keyboard=True,
+    )
+
 
 def yes_no_kb(yes_cb: str, no_cb: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
@@ -378,8 +389,9 @@ async def organizer_choose_city_from_bottom(message: Message, state: FSMContext)
         await state.update_data(city_slug=slug, city_name=info.get("name"))
         await state.set_state(OrganizerEvent.category)
         await message.answer(
-            f"<b>{h(info.get('name'))}</b> выбран!",
-            reply_markup=categories_kb(),
+            f"<b>{h(info.get('name'))}</b> выбран!\n"
+            f"Выберите вид мероприятия!",
+        reply_markup=organizer_categories_choice_kb(),
             parse_mode="HTML",
         )
         return
@@ -415,6 +427,33 @@ async def organizer_city(callback: CallbackQuery, state: FSMContext):
         parse_mode="HTML",
     )
     await callback.answer()
+
+ORG_CATEGORY_TEXT_TO_CODE = {
+    "🖼 Выставка": "EXHIBITION",
+    "🧑‍🏫🏛 Мастер-класс": "MASTERCLASS",
+    "🎤 Концерт": "CONCERT",
+    "🎭 Выступление": "PERFORMANCE",
+    "🎓 Лекция/семинар": "LECTURE",
+    "✨ Другое": "OTHER",
+}
+
+@router.message(OrganizerEvent.category, F.text.in_(set(ORG_CATEGORY_TEXT_TO_CODE.keys())))
+async def organizer_choose_category_from_bottom(message: Message, state: FSMContext):
+    await touch_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
+    code = ORG_CATEGORY_TEXT_TO_CODE.get(message.text)
+    if not code:
+        await message.answer("Выбери категорию кнопками ниже.", reply_markup=organizer_categories_choice_kb())
+        return
+
+    await state.update_data(category=code)
+    await state.set_state(OrganizerEvent.title)
+    await message.answer("<b>Название события</b>:", parse_mode="HTML")
 
 
 @router.callback_query(F.data.startswith("org_cat:"), OrganizerEvent.category)
