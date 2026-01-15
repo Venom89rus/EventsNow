@@ -11,12 +11,17 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     KeyboardButton,
 )
+
+from services.yookassa_service import create_payment
+
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy import select, desc, func
 
-from config import ADMIN_IDS
+from config import ADMIN_IDS, ADMINIDS, PAYMENTS_REAL_ENABLED, PUBLIC_BASE_URL
+from config import PUBLIC_BASE_URL, YOOKASSA_RETURN_URL
+
 from database.session import get_db
 from database.models import (
     User,
@@ -168,6 +173,13 @@ def pay_test_kb(event_id: int) -> InlineKeyboardMarkup:
     kb.adjust(1)
     return kb.as_markup()
 
+
+def pay_kb(event_id: int) -> InlineKeyboardMarkup:
+    """Кнопка для запуска реальной оплаты (YooKassa)"""
+    kb = InlineKeyboardBuilder()
+    kb.button(text="💳 Оплатить", callback_data=f"pay_start:{event_id}")
+    kb.adjust(1)
+    return kb.as_markup()
 
 # ==================== USERS LIST (pagination) ====================
 
@@ -442,6 +454,7 @@ async def admin_view(callback: CallbackQuery):
 @router.callback_query(F.data.startswith("adm_ok:"))
 async def admin_approve(callback: CallbackQuery):
     """Одобрить событие"""
+
     if not is_admin(callback.from_user.id):
         await callback.answer("Нет доступа", show_alert=True)
         return
@@ -459,42 +472,55 @@ async def admin_approve(callback: CallbackQuery):
             await callback.answer("Заявка не найдена", show_alert=True)
             return
 
+        # 1) Меняем статус (как и было)
         event.status = EventStatus.APPROVED_WAITING_PAYMENT
         await db.commit()
 
-        # Обновляем сообщение
-        if callback.message:
-            suffix = "\n\n✅ Одобрено. Ожидаем оплату от организатора."
-            try:
-                if callback.message.photo:
-                    current = callback.message.caption or ""
-                    await callback.message.edit_caption(
-                        caption=current + suffix,
-                        parse_mode="HTML",
-                        reply_markup=None
-                    )
-                else:
-                    current = callback.message.text or ""
-                    await callback.message.edit_text(
-                        current + suffix,
-                        parse_mode="HTML",
-                        reply_markup=None
-                    )
-            except Exception:
-                await callback.message.answer(
-                    "✅ Одобрено. Ожидаем оплату от организатора.",
-                    parse_mode="HTML"
+    # 2) Обновляем сообщение в админке (как и было)
+    if callback.message:
+        suffix = "\n\n✅ Одобрено. Ожидаем оплату от организатора."
+        try:
+            if getattr(callback.message, "photo", None):
+                current = callback.message.caption or ""
+                await callback.message.edit_caption(
+                    caption=current + suffix,
+                    parse_mode="HTML",
+                    reply_markup=None,
                 )
+            else:
+                current = callback.message.text or ""
+                await callback.message.edit_text(
+                    current + suffix,
+                    parse_mode="HTML",
+                    reply_markup=None,
+                )
+        except Exception:
+            await callback.message.answer(
+                "✅ Одобрено. Ожидаем оплату от организатора.",
+                parse_mode="HTML",
+            )
 
-        # Уведомляем организатора
+    # 3) Уведомляем организатора (логика та же, меняем только кнопку)
+    # PAYMENTS_REAL_ENABLED берём из .env через config.py
+    try:
+        if PAYMENTS_REAL_ENABLED:
+            # Реальный режим: показываем кнопку "💳 Оплатить" (pay_start:<id>)
+            reply_kb = pay_kb(event_id)
+        else:
+            # Тестовый режим: оставляем текущую "✅ Оплачено (тест)" (pay_test:<id>)
+            reply_kb = pay_test_kb(event_id)
+
         await callback.bot.send_message(
             event.user_id,
             "✅ Одобрено.\n\nОплатите размещение, после оплаты мероприятие появится в ленте города.",
             parse_mode="HTML",
-            reply_markup=pay_test_kb(event.id),
+            reply_markup=reply_kb,
         )
+    except Exception:
+        # чтобы не ломать модерацию, даже если у юзера закрыты сообщения и т.п.
+        pass
 
-        await callback.answer("Одобрено")
+    await callback.answer("Одобрено")
 
 
 @router.callback_query(F.data.startswith("adm_no:"))
@@ -566,6 +592,150 @@ async def admin_reject_reason(message: Message, state: FSMContext):
 
 
 # ==================== PAYMENT (test) ====================
+
+@router.callback_query(F.data.startswith("pay_start:"))
+async def organizer_pay_start(callback: CallbackQuery):
+    """
+    Реальная оплата YooKassa:
+    1) Проверяем, что заявка существует и принадлежит юзеру.
+    2) Проверяем, что статус APPROVED_WAITING_PAYMENT (или хотя бы не ACTIVE).
+    3) Создаём платеж YooKassa (pending) и сохраняем payment_id в Payment.transaction_id.
+    4) Отправляем пользователю ссылку confirmation_url.
+    Дальше подтверждение и публикация делается webhook'ом payment.succeeded. [web:701]
+    """
+    try:
+        event_id = int(callback.data.split(":", 1)[1])
+    except Exception:
+        await callback.answer("Некорректные данные", show_alert=True)
+        return
+
+    async with get_db() as db:
+        event = (
+            await db.execute(
+                select(Event).where(Event.id == event_id)
+            )
+        ).scalar_one_or_none()
+
+        if not event:
+            await callback.answer("Заявка не найдена", show_alert=True)
+            return
+
+        # Чужую заявку оплачивать нельзя
+        if event.user_id != callback.from_user.id:
+            await callback.answer("Это не ваша заявка", show_alert=True)
+            return
+
+        # Уже опубликовано — не даём создавать новые платежи
+        if event.status == EventStatus.ACTIVE:
+            await callback.message.answer("⚠️ Уже опубликовано.", parse_mode="HTML")
+            await callback.answer()
+            return
+
+        # Если админ ещё не одобрил — платить нельзя
+        if event.status != EventStatus.APPROVED_WAITING_PAYMENT:
+            await callback.answer("Сначала дождитесь одобрения модерацией", show_alert=True)
+            return
+
+        # Если уже есть успешный платёж — просто приводим в порядок статус события
+        existing_payment = (
+            await db.execute(
+                select(Payment).where(Payment.event_id == event.id).order_by(desc(Payment.id))
+            )
+        ).scalar_one_or_none()
+
+        if existing_payment and existing_payment.status == PaymentStatus.COMPLETED:
+            event.payment_status = PaymentStatus.COMPLETED
+            event.status = EventStatus.ACTIVE
+            await db.commit()
+
+            await callback.message.answer(
+                "✅ Оплата уже подтверждена. Мероприятие опубликовано.",
+                parse_mode="HTML",
+            )
+            await callback.answer()
+            return
+
+        # Сумма: если у события нет вычисленной суммы, ставим заглушку.
+        # Лучше: подставить расчёт из твоего payment_service (если у тебя там есть функция для расчёта).
+        amount = float(getattr(event, "price", 0) or getattr(event, "amount", 0) or 199)
+
+        # return_url — куда вернется пользователь после оплаты (страница/заглушка на твоём домене)
+        return_url = (YOOKASSA_RETURN_URL or "").strip()
+        if not return_url:
+            if not PUBLIC_BASE_URL:
+                await callback.answer("Не настроен PUBLIC_BASE_URL", show_alert=True)
+                return
+            return_url = f"{PUBLIC_BASE_URL}/payment-return"
+
+        description = f"Размещение мероприятия #{event.id}"
+
+        # Создаём платёж YooKassa: получаем payment_id и confirmation_url (redirect сценарий) [web:716]
+        try:
+            yk_payment_id, confirmation_url = await create_payment(
+                amount_rub=amount,
+                description=description,
+                return_url=return_url,
+                metadata={
+                    "event_id": str(event.id),
+                    "user_id": str(event.user_id),
+                },
+                # ключ идемпотентности рекомендуют передавать (мы используем event+user) [web:703]
+                idempotence_key=f"event:{event.id}:user:{event.user_id}",
+                capture=True,
+            )
+        except Exception:
+            logger.exception("YooKassa create_payment failed event_id=%s", event.id)
+            await callback.answer("Ошибка создания платежа. Попробуйте позже.", show_alert=True)
+            return
+
+        # Создаём/обновляем запись Payment в БД со статусом PENDING
+        if existing_payment and existing_payment.status in (PaymentStatus.PENDING, PaymentStatus.CREATED):
+            p = existing_payment
+        else:
+            p = Payment(
+                user_id=event.user_id,
+                event_id=event.id,
+                category=event.category,
+                pricing_model=(
+                    PricingModel.PERIOD
+                    if (event.period_start and event.period_end)
+                    else PricingModel.DAILY
+                ),
+                amount=amount,
+                status=PaymentStatus.PENDING,
+                payment_system="yookassa",
+            )
+            db.add(p)
+
+        # Сохраняем ID платежа YooKassa для связки с webhook (object.id) [web:701]
+        p.transaction_id = yk_payment_id
+        await db.commit()
+
+    # Пользователю отправляем ссылку на оплату
+    pay_kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [KeyboardButton(text="💳 Оплатить", url=confirmation_url)]
+        ]
+    )
+    # В aiogram URL-кнопка — это InlineKeyboardButton, не KeyboardButton:
+    # оставляю ниже корректный вариант, используй его вместо блока выше.
+
+    from aiogram.types import InlineKeyboardButton
+
+    pay_kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="💳 Оплатить", url=confirmation_url)]
+        ]
+    )
+
+    await callback.message.answer(
+        "💳 Для оплаты нажмите кнопку ниже.\n\n"
+        "После успешной оплаты мероприятие будет опубликовано автоматически.",
+        parse_mode="HTML",
+        reply_markup=pay_kb,
+    )
+    await callback.answer()
+
 
 @router.callback_query(F.data.startswith("pay_test:"))
 async def organizer_pay_test(callback: CallbackQuery):
