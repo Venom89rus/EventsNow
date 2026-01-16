@@ -29,8 +29,11 @@ def basic_auth_header(shop_id: str, secret_key: str) -> str:
 
 
 def load_yookassa_config_from_env() -> YooKassaConfig:
-    shop_id = (os.getenv("YOOKASSA_SHOP_ID") or "").strip()
-    secret_key = (os.getenv("YOOKASSA_SECRET_KEY") or "").strip()
+    # В твоём проекте встречались разные имена env; поддержим оба варианта.
+    shop_id = (os.getenv("YOOKASSA_SHOP_ID") or os.getenv("YOOKASSASHOPID") or "").strip()
+    secret_key = (
+        (os.getenv("YOOKASSA_SECRET_KEY") or os.getenv("YOOKASSASECRETKEY") or "").strip()
+    )
     if not shop_id or not secret_key:
         raise YooKassaError("YOOKASSA_SHOP_ID/YOOKASSA_SECRET_KEY are not set")
     return YooKassaConfig(shop_id=shop_id, secret_key=secret_key)
@@ -41,24 +44,56 @@ async def create_payment(
     amount_rub: float,
     description: str,
     return_url: str,
+    customer_email: str,
     metadata: Optional[dict[str, Any]] = None,
     idempotence_key: Optional[str] = None,
     capture: bool = True,
+    # 1 — ОСН, 2 — УСН доход, 3 — УСН доход-расход, 4 — ЕНВД, 5 — ЕСХН, 6 — ПСН
+    tax_system_code: int = 2,
+    # 1=без НДС, 2=0%, 3=10%, 4=20%, 5=10/110, 6=20/120
+    vat_code: int = 1,
 ) -> Tuple[str, str]:
     """
     Returns: (payment_id, confirmation_url).
-    Uses confirmation.type=redirect -> confirmation_url.
+
+    Uses confirmation.type=redirect -> confirmation.confirmation_url.
+
     Note: Use Idempotence-Key to avoid duplicates on retries.
+
+    Для ИП/54-ФЗ: receipt обязателен (customer + items + tax_system_code + vat_code).
     """
     cfg = load_yookassa_config_from_env()
 
     value = f"{float(amount_rub):.2f}"
+    safe_desc = (description or "")[:128]
+
+    if not customer_email or "@" not in customer_email:
+        raise YooKassaError("customer_email is required for receipt (54-FZ) and must look like email")
+
     payload: dict[str, Any] = {
         "amount": {"value": value, "currency": "RUB"},
         "confirmation": {"type": "redirect", "return_url": return_url},
         "capture": bool(capture),
-        "description": (description or "")[:128],
+        "description": safe_desc,
+        "receipt": {
+            "tax_system_code": int(tax_system_code),
+            "customer": {
+                "email": customer_email,
+            },
+            "items": [
+                {
+                    "description": safe_desc,
+                    "quantity": "1.00",
+                    "amount": {"value": value, "currency": "RUB"},
+                    "vat_code": int(vat_code),
+                    # Для услуги размещения обычно подходит service + full_payment
+                    "payment_subject": "service",
+                    "payment_mode": "full_payment",
+                }
+            ],
+        },
     }
+
     if metadata:
         payload["metadata"] = metadata
 
@@ -80,36 +115,33 @@ async def create_payment(
         async with session.post(
             url,
             headers=headers,
-            data=json.dumps(payload),
+            data=json.dumps(payload, ensure_ascii=False),
             ssl=ssl_context,
         ) as resp:
             raw = await resp.text()
             if resp.status not in (200, 201):
                 raise YooKassaError(f"create_payment failed {resp.status}: {raw}")
 
-            data = json.loads(raw)
-            payment_id = data.get("id")
-            confirmation_url = (
-                (data.get("confirmation") or {}).get("confirmation_url")
-                or data.get("confirmation_url")
-            )
+    data = json.loads(raw)
+    payment_id = data.get("id")
+    confirmation_url = (data.get("confirmation") or {}).get("confirmation_url") or data.get(
+        "confirmation_url"
+    )
 
-            if not payment_id or not confirmation_url:
-                raise YooKassaError(f"Bad YooKassa response: {data}")
+    if not payment_id or not confirmation_url:
+        raise YooKassaError(f"Bad YooKassa response: {data}")
 
-            return str(payment_id), str(confirmation_url)
+    return str(payment_id), str(confirmation_url)
 
 
 def parse_webhook_payload(payload: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     """
     Webhook payload contains:
-    - event: payment.succeeded / payment.canceled / ...
-    - object: payment object (id, status, metadata, ...)
+      - event: payment.succeeded / payment.canceled / ...
+      - object: payment object (id, status, metadata, ...)
     """
     event = payload.get("event")
     obj = payload.get("object") or {}
-
     if not event or not isinstance(obj, dict):
         raise YooKassaError("Invalid webhook payload: missing event/object")
-
     return str(event), obj

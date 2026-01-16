@@ -6,6 +6,7 @@ from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import ErrorEvent
 
 logger = logging.getLogger("eventsnow")
 
@@ -49,9 +50,12 @@ async def main():
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
 
+
     @dp.errors()
-    async def on_error(event, exception):
-        logger.exception("UNHANDLED_ERROR event=%r exception=%r", event, exception)
+    async def on_error(event: ErrorEvent):
+        # event.exception — само исключение
+        # event.update — апдейт (если нужен)
+        logger.exception("UNHANDLED_ERROR: %r", event.exception)
         return True
 
     # **ПОРЯДОК ИМЕЕТ ЗНАЧЕНИЕ:** админ должен быть до resident/organizer

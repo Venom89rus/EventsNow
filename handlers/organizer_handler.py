@@ -15,9 +15,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-
-
-from config import ADMIN_IDS, CITIES, DEFAULT_CITY
+from config import ADMIN_IDS, CITIES, DEFAULT_CITY, PRICING_CONFIG
 from services.payment_service import calculate_price, PricingError
 from services.stats_service import get_global_user_stats
 from services.user_activity import touch_user
@@ -74,6 +72,38 @@ PRICE_TIER_PRESETS = {
 
 def _format_category_ru(code: str) -> str:
     return CATEGORY_LABELS_RU.get(code, code)
+
+def build_pricing_text() -> str:
+    lines = [
+        "<b>Прайс на размещение</b>",
+        "Минимальная стоимость по категориям:",
+        "",
+    ]
+
+    order = ["EXHIBITION", "MASTERCLASS", "CONCERT", "PERFORMANCE", "LECTURE", "OTHER"]
+
+    for code in order:
+        cfg = PRICING_CONFIG.get(code)
+        if not cfg:
+            continue
+
+        name = cfg.get("name") or _format_category_ru(code)
+        model = (cfg.get("model") or "").lower()
+        packages = cfg.get("packages") or {}
+
+        if not packages:
+            lines.append(f"• <b>{name}</b> — цены уточняются")
+            continue
+
+        min_price = min(packages.values())
+        unit = "за пост" if model == "daily" else "за период"
+        lines.append(f"• <b>{name}</b> — от {int(min_price)} ₽ ({unit})")
+
+    lines += [
+        "",
+        "Оплата появляется после модерации: событие одобрят → появится кнопка оплаты публикации.",
+    ]
+    return "\n".join(lines)
 
 
 def _format_period_or_date(data: dict) -> str:
@@ -163,7 +193,7 @@ def organizer_city_choice_kb() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="✅ Ноябрьск"), KeyboardButton(text="🏙 Муравленко")],
             [KeyboardButton(text="🏙 Губкинский"), KeyboardButton(text="🏙 Новый Уренгой")],
-            [KeyboardButton(text="⬅️ Назад")],
+            [KeyboardButton(text="⬅️ Назад"), KeyboardButton(text="Прайс")],
         ],
         resize_keyboard=True,
     )
@@ -191,7 +221,6 @@ def organizer_menu_kb() -> ReplyKeyboardMarkup:
         resize_keyboard=True,
     )
 
-
 def cities_kb_for_organizer() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for slug, info in sorted(CITIES.items(), key=lambda x: x[1]["name"]):
@@ -199,7 +228,6 @@ def cities_kb_for_organizer() -> InlineKeyboardMarkup:
         kb.button(text=f"{emoji} {info['name']}", callback_data=f"org_city:{slug}")
     kb.adjust(1)
     return kb.as_markup()
-
 
 def categories_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
@@ -222,7 +250,6 @@ def organizer_categories_choice_kb() -> ReplyKeyboardMarkup:
         ],
         resize_keyboard=True,
     )
-
 
 def yes_no_kb(yes_cb: str, no_cb: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
@@ -286,6 +313,27 @@ class OrganizerEvent(StatesGroup):
 
 
 # -------- Menu actions --------
+def build_pricing_text() -> str:
+    lines = [
+        "<b>Прайс на размещение</b>",
+        "Минимальная стоимость по категориям:",
+        "",
+    ]
+    order = ["EXHIBITION", "MASTERCLASS", "CONCERT", "PERFORMANCE", "LECTURE", "OTHER"]
+
+    for code in order:
+        cfg = PRICING_CONFIG.get(code) or {}
+        name = cfg.get("name") or _format_category_ru(code)
+        packages = cfg.get("packages") or {}
+        if not packages:
+            continue
+        min_price = min(packages.values())
+        lines.append(f"• <b>{name}</b> — от {int(min_price)} ₽")
+
+    lines.append("")
+    lines.append("Чтобы продолжить, выбери город и создай событие.")
+    return "\n".join(lines)
+
 
 @router.message(F.text == "⬅️ Назад")
 async def organizer_back_message(message: Message, state: FSMContext):
@@ -355,6 +403,16 @@ async def organizer_entry(message: Message, state: FSMContext):
         reply_markup=organizer_city_choice_kb(),
         parse_mode="HTML",
     )
+
+@router.message(F.text == "Прайс")
+async def organizer_price_message(message: Message, state: FSMContext):
+    await touch_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+    await message.answer(build_pricing_text(), parse_mode="HTML", reply_markup=organizer_menu_kb())
 
 
 # -------- Flow --------

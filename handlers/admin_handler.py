@@ -13,6 +13,7 @@ from aiogram.types import (
 )
 
 from services.yookassa_service import create_payment
+from config import PRICING_CONFIG
 
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -22,6 +23,9 @@ from sqlalchemy import select, desc, func
 from config import ADMIN_IDS, ADMINIDS, PAYMENTS_REAL_ENABLED, PUBLIC_BASE_URL
 from config import PUBLIC_BASE_URL, YOOKASSA_RETURN_URL
 
+from services.yookassa_service import create_payment
+from services.payment_service import calculate_price, PricingError
+
 from database.session import get_db
 from database.models import (
     User,
@@ -30,6 +34,7 @@ from database.models import (
     Payment,
     PaymentStatus,
     PricingModel,
+    EventCategory
 )
 from services.stats_service import get_global_user_stats
 from services.user_activity import touch_user
@@ -595,52 +600,35 @@ async def admin_reject_reason(message: Message, state: FSMContext):
 
 @router.callback_query(F.data.startswith("pay_start:"))
 async def organizer_pay_start(callback: CallbackQuery):
-    """
-    Реальная оплата YooKassa:
-    1) Проверяем, что заявка существует и принадлежит юзеру.
-    2) Проверяем, что статус APPROVED_WAITING_PAYMENT (или хотя бы не ACTIVE).
-    3) Создаём платеж YooKassa (pending) и сохраняем payment_id в Payment.transaction_id.
-    4) Отправляем пользователю ссылку confirmation_url.
-    Дальше подтверждение и публикация делается webhook'ом payment.succeeded. [web:701]
-    """
     try:
         event_id = int(callback.data.split(":", 1)[1])
     except Exception:
-        await callback.answer("Некорректные данные", show_alert=True)
+        await callback.answer("Некорректные данные.", show_alert=True)
         return
 
     async with get_db() as db:
-        event = (
-            await db.execute(
-                select(Event).where(Event.id == event_id)
-            )
-        ).scalar_one_or_none()
-
+        event = (await db.execute(select(Event).where(Event.id == event_id))).scalar_one_or_none()
         if not event:
-            await callback.answer("Заявка не найдена", show_alert=True)
+            await callback.answer("Событие не найдено.", show_alert=True)
             return
 
-        # Чужую заявку оплачивать нельзя
+        # owner-check
         if event.user_id != callback.from_user.id:
-            await callback.answer("Это не ваша заявка", show_alert=True)
+            await callback.answer("Это событие принадлежит другому пользователю.", show_alert=True)
             return
 
-        # Уже опубликовано — не даём создавать новые платежи
         if event.status == EventStatus.ACTIVE:
             await callback.message.answer("⚠️ Уже опубликовано.", parse_mode="HTML")
             await callback.answer()
             return
 
-        # Если админ ещё не одобрил — платить нельзя
         if event.status != EventStatus.APPROVED_WAITING_PAYMENT:
-            await callback.answer("Сначала дождитесь одобрения модерацией", show_alert=True)
+            await callback.answer("Оплата будет доступна после модерации.", show_alert=True)
             return
 
-        # Если уже есть успешный платёж — просто приводим в порядок статус события
+        # один платеж на одно событие (event_id unique=True)
         existing_payment = (
-            await db.execute(
-                select(Payment).where(Payment.event_id == event.id).order_by(desc(Payment.id))
-            )
+            await db.execute(select(Payment).where(Payment.event_id == event.id))
         ).scalar_one_or_none()
 
         if existing_payment and existing_payment.status == PaymentStatus.COMPLETED:
@@ -648,89 +636,117 @@ async def organizer_pay_start(callback: CallbackQuery):
             event.status = EventStatus.ACTIVE
             await db.commit()
 
-            await callback.message.answer(
-                "✅ Оплата уже подтверждена. Мероприятие опубликовано.",
-                parse_mode="HTML",
-            )
+            await callback.message.answer("✅ Оплата уже прошла, событие опубликовано.", parse_mode="HTML")
             await callback.answer()
             return
 
-        # Сумма: если у события нет вычисленной суммы, ставим заглушку.
-        # Лучше: подставить расчёт из твоего payment_service (если у тебя там есть функция для расчёта).
-        amount = float(getattr(event, "price", 0) or getattr(event, "amount", 0) or 199)
+        # ---------------- ФИКСИРОВАННАЯ ЦЕНА ИЗ CONFIG ----------------
+        category_code = event.category.value if isinstance(event.category, EventCategory) else str(event.category)
 
-        # return_url — куда вернется пользователь после оплаты (страница/заглушка на твоём домене)
+        cfg = PRICING_CONFIG.get(category_code)
+        if not cfg:
+            await callback.answer("Не найдена конфигурация цены для категории.", show_alert=True)
+            return
+
+        packages = cfg.get("packages") or {}
+        if not packages:
+            await callback.answer("Для категории не задана цена.", show_alert=True)
+            return
+
+        # Берём первый (и по твоей задумке единственный активный) пакет
+        package_key, package_price = next(iter(packages.items()))
+        try:
+            amount = float(package_price)
+        except Exception:
+            await callback.answer("Цена в конфиге задана некорректно.", show_alert=True)
+            return
+
+        model = (cfg.get("model") or "daily").strip().lower()
+        if model == "period":
+            pricing_model = PricingModel.PERIOD
+            package_period = package_key
+            num_days = None
+            package_daily = None
+            num_posts = None
+        else:
+            pricing_model = PricingModel.DAILY
+            package_daily = package_key
+            num_posts = None
+            package_period = None
+            num_days = None
+
+        # return_url
         return_url = (YOOKASSA_RETURN_URL or "").strip()
         if not return_url:
             if not PUBLIC_BASE_URL:
-                await callback.answer("Не настроен PUBLIC_BASE_URL", show_alert=True)
+                await callback.answer("PUBLIC_BASE_URL не настроен.", show_alert=True)
                 return
             return_url = f"{PUBLIC_BASE_URL}/payment-return"
 
-        description = f"Размещение мероприятия #{event.id}"
+        description = f"Оплата публикации события #{event.id}"
 
-        # Создаём платёж YooKassa: получаем payment_id и confirmation_url (redirect сценарий) [web:716]
+        # email для чека (в модели User email нет -> fallback)
+        user = (await db.execute(select(User).where(User.telegram_id == event.user_id))).scalar_one_or_none()
+        customer_email = getattr(user, "email", None) if user else None
+        if not customer_email:
+            customer_email = "your-ip-email@example.com"
+
         try:
             yk_payment_id, confirmation_url = await create_payment(
                 amount_rub=amount,
                 description=description,
                 return_url=return_url,
-                metadata={
-                    "event_id": str(event.id),
-                    "user_id": str(event.user_id),
-                },
-                # ключ идемпотентности рекомендуют передавать (мы используем event+user) [web:703]
-                idempotence_key=f"event:{event.id}:user:{event.user_id}",
+                customer_email=customer_email,
+                metadata={"event_id": str(event.id), "user_id": str(event.user_id), "category": category_code},
+                idempotence_key=f"event{event.id}-user{event.user_id}",
                 capture=True,
+                tax_system_code=2,
+                vat_code=1,
             )
         except Exception:
             logger.exception("YooKassa create_payment failed event_id=%s", event.id)
-            await callback.answer("Ошибка создания платежа. Попробуйте позже.", show_alert=True)
+            await callback.answer("Не удалось создать оплату. Попробуйте позже.", show_alert=True)
             return
 
-        # Создаём/обновляем запись Payment в БД со статусом PENDING
-        if existing_payment and existing_payment.status in (PaymentStatus.PENDING, PaymentStatus.CREATED):
-            p = existing_payment
-        else:
+        # Создаем/обновляем Payment
+        if not existing_payment:
             p = Payment(
                 user_id=event.user_id,
                 event_id=event.id,
                 category=event.category,
-                pricing_model=(
-                    PricingModel.PERIOD
-                    if (event.period_start and event.period_end)
-                    else PricingModel.DAILY
-                ),
+                pricing_model=pricing_model,
+                package_daily=package_daily,
+                num_posts=num_posts,
+                package_period=package_period,
+                num_days=num_days,
                 amount=amount,
                 status=PaymentStatus.PENDING,
                 payment_system="yookassa",
+                transaction_id=yk_payment_id,
             )
             db.add(p)
+        else:
+            existing_payment.category = event.category
+            existing_payment.pricing_model = pricing_model
+            existing_payment.package_daily = package_daily
+            existing_payment.num_posts = num_posts
+            existing_payment.package_period = package_period
+            existing_payment.num_days = num_days
+            existing_payment.amount = amount
+            existing_payment.status = PaymentStatus.PENDING
+            existing_payment.payment_system = "yookassa"
+            existing_payment.transaction_id = yk_payment_id
 
-        # Сохраняем ID платежа YooKassa для связки с webhook (object.id) [web:701]
-        p.transaction_id = yk_payment_id
         await db.commit()
-
-    # Пользователю отправляем ссылку на оплату
-    pay_kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [KeyboardButton(text="💳 Оплатить", url=confirmation_url)]
-        ]
-    )
-    # В aiogram URL-кнопка — это InlineKeyboardButton, не KeyboardButton:
-    # оставляю ниже корректный вариант, используй его вместо блока выше.
 
     from aiogram.types import InlineKeyboardButton
 
     pay_kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="💳 Оплатить", url=confirmation_url)]
-        ]
+        inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=confirmation_url)]]
     )
-
     await callback.message.answer(
-        "💳 Для оплаты нажмите кнопку ниже.\n\n"
-        "После успешной оплаты мероприятие будет опубликовано автоматически.",
+        f"💳 Сумма к оплате: {int(amount) if amount.is_integer() else amount} ₽\n"
+        f"Перейди по ссылке и оплати публикацию.",
         parse_mode="HTML",
         reply_markup=pay_kb,
     )
@@ -740,15 +756,14 @@ async def organizer_pay_start(callback: CallbackQuery):
 @router.callback_query(F.data.startswith("pay_test:"))
 async def organizer_pay_test(callback: CallbackQuery):
     """Тестовая оплата события"""
-    event_id = int(callback.data.split(":", 1)[1])
+    try:
+        event_id = int(callback.data.split(":", 1)[1])
+    except Exception:
+        await callback.answer("Некорректные данные.", show_alert=True)
+        return
 
     async with get_db() as db:
-        event = (
-            await db.execute(
-                select(Event).where(Event.id == event_id)
-            )
-        ).scalar_one_or_none()
-
+        event = (await db.execute(select(Event).where(Event.id == event_id))).scalar_one_or_none()
         if not event:
             await callback.answer("Заявка не найдена", show_alert=True)
             return
@@ -762,11 +777,8 @@ async def organizer_pay_test(callback: CallbackQuery):
             await callback.answer()
             return
 
-        # Проверяем, существует ли уже платёж
         existing_payment = (
-            await db.execute(
-                select(Payment).where(Payment.event_id == event.id)
-            )
+            await db.execute(select(Payment).where(Payment.event_id == event.id))
         ).scalar_one_or_none()
 
         if existing_payment and existing_payment.status == PaymentStatus.COMPLETED:
@@ -774,23 +786,23 @@ async def organizer_pay_test(callback: CallbackQuery):
             event.status = EventStatus.ACTIVE
             await db.commit()
         else:
-            # Создаём новый платёж
-            p = Payment(
+            # Тестовый платеж = COMPLETED
+            p = existing_payment or Payment(
                 user_id=event.user_id,
                 event_id=event.id,
                 category=event.category,
-                pricing_model=(
-                    PricingModel.PERIOD
-                    if (event.period_start and event.period_end)
-                    else PricingModel.DAILY
-                ),
+                pricing_model=PricingModel.DAILY,
                 amount=0.0,
                 status=PaymentStatus.COMPLETED,
                 payment_system="test",
                 completed_at=datetime.utcnow(),
             )
+            p.status = PaymentStatus.COMPLETED
+            p.payment_system = "test"
+            p.completed_at = datetime.utcnow()
+            if not existing_payment:
+                db.add(p)
 
-            db.add(p)
             event.payment_status = PaymentStatus.COMPLETED
             event.status = EventStatus.ACTIVE
             await db.commit()
@@ -798,22 +810,21 @@ async def organizer_pay_test(callback: CallbackQuery):
         eid = event.id
         city = event.city_slug
 
-        # Сообщение пользователю
-        await callback.message.answer(
-            "✅ Оплата подтверждена (тест).\nМероприятие опубликовано в ленте города.",
-            parse_mode="HTML",
-        )
+    await callback.message.answer(
+        "✅ Оплата подтверждена (тест).\nМероприятие опубликовано в ленте города.",
+        parse_mode="HTML",
+    )
 
-        # Уведомляем жителей
-        try:
-            logger.warning("NOTIFY: TRY event_id=%s city=%s", eid, city)
-            await asyncio.sleep(0.2)
-            res = await notify_new_event_published(callback.bot, eid)
-            logger.warning("NOTIFY: RESULT event_id=%s res=%s", eid, res)
-        except Exception as e:
-            logger.exception("NOTIFY: ERROR event_id=%s error=%r", eid, e)
+    # Уведомляем жителей (как и было)
+    try:
+        logger.warning("NOTIFY: TRY event_id=%s city=%s", eid, city)
+        await asyncio.sleep(0.2)
+        res = await notify_new_event_published(callback.bot, eid)
+        logger.warning("NOTIFY: RESULT event_id=%s res=%s", eid, res)
+    except Exception as e:
+        logger.exception("NOTIFY: ERROR event_id=%s error=%r", eid, e)
 
-        await callback.answer()
+    await callback.answer()
 
 
 @router.message(AdminState.panel)
