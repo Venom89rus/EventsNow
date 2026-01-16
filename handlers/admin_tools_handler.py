@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 from aiogram import Router, F
+from aiogram.filters import Command, CommandObject
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
-
 from sqlalchemy import select, delete, func
 
 from database.session import get_db
@@ -31,12 +31,13 @@ BTN_DRYRUN_2H = "🔎 Проверить (2ч)"
 BTN_DELETE_2H = "🗑 Удалить (2ч)"
 BTN_DRYRUN_24H = "🔎 Проверить (24ч)"
 BTN_DELETE_24H = "🗑 Удалить (24ч)"
-
 BTN_DELETE_ALL = "🧨 Удалить ВСЕ события"
 BTN_CONFIRM_DELETE_ALL = "✅ Да, удалить ВСЕ события"
 BTN_CANCEL_DELETE_ALL = "❎ Отмена"
-
 BTN_BACK_ADMIN = "⬅️ В админ-панель"
+
+# pending confirm for /cleanup
+_PENDING: dict[int, dict] = {}  # user_id -> {"mode": "2h|24h|all", "hours": int|None}
 
 
 def is_admin(user_id: int) -> bool:
@@ -66,10 +67,7 @@ def confirm_delete_all_kb() -> ReplyKeyboardMarkup:
 
 
 def admin_panel_kb_local() -> ReplyKeyboardMarkup:
-    """
-    Локальная копия клавиатуры админки (чтобы не импортировать admin_handler.py и не ловить циклы).
-    Под твой скрин: События на модерацию / Статистика / Пользователи / Финансы / Назад.
-    """
+    # локальная копия, чтобы не импортить admin_handler.py и не ловить циклы
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🗂 События на модерацию"), KeyboardButton(text="📊 Статистика")],
@@ -84,24 +82,17 @@ async def _count_all() -> tuple[int, int]:
     async with get_db() as db:
         events_cnt = (await db.execute(select(func.count()).select_from(Event))).scalar_one() or 0
         photos_cnt = (await db.execute(select(func.count()).select_from(EventPhoto))).scalar_one() or 0
-    return int(events_cnt), int(photos_cnt)
+        return int(events_cnt), int(photos_cnt)
 
 
 async def _cleanup_by_hours(hours: int, confirm: bool) -> tuple[int, int, str]:
-    """
-    Удаляет события за последние N часов.
-    Возвращает: (events_deleted, photos_deleted_estimate, filter_text)
-    """
     dt_from = datetime.utcnow() - timedelta(hours=hours)
 
     async with get_db() as db:
         events_cnt = (
-            await db.execute(
-                select(func.count()).select_from(Event).where(Event.created_at >= dt_from)
-            )
+            await db.execute(select(func.count()).select_from(Event).where(Event.created_at >= dt_from))
         ).scalar_one() or 0
 
-        # Оценка по фото: считаем фото у событий, попадающих под условие.
         photos_cnt = (
             await db.execute(
                 select(func.count())
@@ -118,13 +109,136 @@ async def _cleanup_by_hours(hours: int, confirm: bool) -> tuple[int, int, str]:
     return int(events_cnt), int(photos_cnt), filt
 
 
-# --- entry point ---
-@router.message(F.text.in_({BTN_TOOLS, "/cleanup"}))
-async def tools_entry(message: Message):
+async def _delete_all(confirm: bool) -> tuple[int, int]:
+    async with get_db() as db:
+        events_cnt = (await db.execute(select(func.count()).select_from(Event))).scalar_one() or 0
+        photos_cnt = (await db.execute(select(func.count()).select_from(EventPhoto))).scalar_one() or 0
+        if confirm:
+            await db.execute(delete(Event))
+        return int(events_cnt), int(photos_cnt)
+
+
+async def _show_tools_menu(message: Message) -> None:
+    await message.answer("🧹 Инструменты очистки. Выбери действие:", reply_markup=tools_kb())
+
+
+# -------------------------
+# /cleanup command
+# -------------------------
+@router.message(Command("cleanup"))
+async def cmd_cleanup(message: Message, command: CommandObject):
     if not is_admin(message.from_user.id):
         await message.answer("Нет доступа")
         return
-    await message.answer("🧹 Инструменты очистки. Выбери действие:", reply_markup=tools_kb())
+
+    args = (command.args or "").strip().lower()
+    uid = message.from_user.id
+
+    # /cleanup -> меню
+    if not args:
+        await _show_tools_menu(message)
+        return
+
+    # cancel
+    if args in {"cancel", "no", "отмена"}:
+        _PENDING.pop(uid, None)
+        await message.answer("Ок, отменено.", reply_markup=tools_kb())
+        return
+
+    # confirm
+    if args in {"confirm", "yes", "да"}:
+        pending = _PENDING.get(uid)
+        if not pending:
+            await message.answer(
+                "Нет действия для подтверждения. Сначала: /cleanup 2h | /cleanup 24h | /cleanup all",
+                reply_markup=tools_kb(),
+            )
+            return
+
+        mode = pending["mode"]
+        if mode in {"2h", "24h"}:
+            hours = int(pending["hours"])
+            n_events, n_photos, filt = await _cleanup_by_hours(hours=hours, confirm=True)
+            _PENDING.pop(uid, None)
+            await message.answer(
+                f"✅ Удалено событий: {n_events}\n"
+                f"✅ Удалено фото (каскад): {n_photos}\n"
+                f"Фильтр: {filt}",
+                reply_markup=tools_kb(),
+            )
+            return
+
+        if mode == "all":
+            n_events, n_photos = await _delete_all(confirm=True)
+            _PENDING.pop(uid, None)
+            await message.answer(
+                f"✅ Удалено событий: {n_events}\n"
+                f"✅ Удалено фото (каскад): {n_photos}",
+                reply_markup=tools_kb(),
+            )
+            return
+
+        await message.answer("Неизвестный режим подтверждения.", reply_markup=tools_kb())
+        return
+
+    # request delete by period / all (dry-run + require confirm)
+    if args in {"2h", "2", "2ч"}:
+        n_events, n_photos, filt = await _cleanup_by_hours(hours=2, confirm=False)
+        _PENDING[uid] = {"mode": "2h", "hours": 2}
+        await message.answer(
+            "⚠️ Подтверди удаление\n\n"
+            f"Удалится событий: {n_events}\n"
+            f"Удалится фото (каскад): {n_photos}\n"
+            f"Фильтр: {filt}\n\n"
+            "Подтвердить: /cleanup confirm\n"
+            "Отмена: /cleanup cancel",
+            reply_markup=tools_kb(),
+        )
+        return
+
+    if args in {"24h", "24", "24ч"}:
+        n_events, n_photos, filt = await _cleanup_by_hours(hours=24, confirm=False)
+        _PENDING[uid] = {"mode": "24h", "hours": 24}
+        await message.answer(
+            "⚠️ Подтверди удаление\n\n"
+            f"Удалится событий: {n_events}\n"
+            f"Удалится фото (каскад): {n_photos}\n"
+            f"Фильтр: {filt}\n\n"
+            "Подтвердить: /cleanup confirm\n"
+            "Отмена: /cleanup cancel",
+            reply_markup=tools_kb(),
+        )
+        return
+
+    if args in {"all", "все", "all_events"}:
+        events_cnt, photos_cnt = await _delete_all(confirm=False)
+        _PENDING[uid] = {"mode": "all", "hours": None}
+        await message.answer(
+            "⚠️ ОПАСНО: удаление ВСЕХ событий\n\n"
+            f"Событий в базе: {events_cnt}\n"
+            f"Фото событий: {photos_cnt}\n\n"
+            "Подтвердить: /cleanup confirm\n"
+            "Отмена: /cleanup cancel",
+            reply_markup=tools_kb(),
+        )
+        return
+
+    await message.answer(
+        "Не понял аргумент. Используй: /cleanup, /cleanup 2h, /cleanup 24h, /cleanup all.",
+        reply_markup=tools_kb(),
+    )
+
+
+# -------------------------
+# Existing button handlers
+# -------------------------
+
+@router.message(F.text == BTN_TOOLS)
+async def tools_entry_button(message: Message):
+    if not is_admin(message.from_user.id):
+        await message.answer("Нет доступа")
+        return
+    await _show_tools_menu(message)
 
 
 @router.message(F.text == BTN_BACK_ADMIN)
@@ -135,7 +249,6 @@ async def tools_back_to_admin(message: Message):
     await message.answer("🛡 Админ-панель:", reply_markup=admin_panel_kb_local())
 
 
-# --- 2h / 24h actions ---
 @router.message(F.text == BTN_DRYRUN_2H)
 async def dryrun_2h(message: Message):
     if not is_admin(message.from_user.id):
@@ -194,7 +307,6 @@ async def delete_24h(message: Message):
     )
 
 
-# --- delete all: start/confirm/cancel ---
 @router.message(F.text == BTN_DELETE_ALL)
 async def delete_all_start(message: Message):
     if not is_admin(message.from_user.id):
@@ -225,18 +337,9 @@ async def delete_all_confirm(message: Message):
     if not is_admin(message.from_user.id):
         await message.answer("Нет доступа")
         return
-
-    async with get_db() as db:
-        events_cnt = (await db.execute(select(func.count()).select_from(Event))).scalar_one() or 0
-        photos_cnt = (
-            await db.execute(select(func.count()).select_from(EventPhoto))
-        ).scalar_one() or 0
-
-        # Удаляем только events — фото уйдут каскадно (FK ondelete + relationship cascade)
-        await db.execute(delete(Event))
-
+    n_events, n_photos = await _delete_all(confirm=True)
     await message.answer(
-        f"✅ Удалено событий: {int(events_cnt)}\n"
-        f"✅ Удалено фото (каскад): {int(photos_cnt)}",
+        f"✅ Удалено событий: {n_events}\n"
+        f"✅ Удалено фото (каскад): {n_photos}",
         reply_markup=tools_kb(),
     )

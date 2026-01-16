@@ -15,11 +15,14 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import BOT_TOKEN  # noqa: E402
 from database.session import init_db  # noqa: E402
+
 from handlers.start_handler import router as start_router  # noqa: E402
 from handlers.admin_handler import router as admin_router  # noqa: E402
+from handlers.admin_tools_handler import router as admin_tools_router  # noqa: E402
 from handlers.resident_handler import router as resident_router  # noqa: E402
 from handlers.organizer_handler import router as organizer_router  # noqa: E402
 from handlers.feedback_handler import router as feedback_router  # noqa: E402
+
 from services.event_archive import archive_expired_events  # noqa: E402
 
 os.makedirs("logs", exist_ok=True)
@@ -46,28 +49,23 @@ async def main():
     except Exception as e:
         logger.exception("Archive job failed: %s", e)
 
-    # Создаём бот и диспетчер
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
 
-
     @dp.errors()
     async def on_error(event: ErrorEvent):
-        # event.exception — само исключение
-        # event.update — апдейт (если нужен)
         logger.exception("UNHANDLED_ERROR: %r", event.exception)
         return True
 
-    # **ПОРЯДОК ИМЕЕТ ЗНАЧЕНИЕ:** админ должен быть до resident/organizer
-    # чтобы его кнопки не перехватывались
+    # Порядок важен: админ до resident/organizer
     dp.include_router(start_router)
     dp.include_router(admin_router)
+    dp.include_router(admin_tools_router)
     dp.include_router(resident_router)
     dp.include_router(organizer_router)
     dp.include_router(feedback_router)
 
     logger.info("🤖 EventsNow started")
-
     await dp.start_polling(bot)
 
 
