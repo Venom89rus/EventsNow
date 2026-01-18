@@ -95,6 +95,7 @@ def admin_panel_kb() -> ReplyKeyboardMarkup:
     )
 
 
+
 class AdminState(StatesGroup):
     """Состояния админа"""
     panel = State()
@@ -168,6 +169,15 @@ def moderation_kb(event_id: int) -> InlineKeyboardMarkup:
     kb.button(text="❌ Отклонить", callback_data=f"adm_no:{event_id}")
     kb.button(text="📄 Подробнее", callback_data=f"adm_view:{event_id}")
     kb.adjust(2, 1)
+    return kb.as_markup()
+
+def fix_reject_kb(event_id: int) -> InlineKeyboardMarkup:
+    """
+    Кнопка для организатора: создать копию отклонённого события и отправить заново.
+    """
+    kb = InlineKeyboardBuilder()
+    kb.button(text="✏️ Исправить и отправить заново", callback_data=f"org_fix:{event_id}")
+    kb.adjust(1)
     return kb.as_markup()
 
 
@@ -282,7 +292,7 @@ async def admin_users_start(message: Message):
 
 # ==================== ENTRY / NAV ====================
 
-@router.message(F.text.in_({"🔧 Админ", "🛡 Админ"}))
+@router.message(F.text.in_({"🔧 Админ"}))
 async def admin_entry(message: Message, state: FSMContext):
     """Вход в админ-панель"""
     await _touch_from_message(message)
@@ -293,6 +303,44 @@ async def admin_entry(message: Message, state: FSMContext):
 
     await state.set_state(AdminState.panel)
     await message.answer("🛡 Админ-панель:", reply_markup=admin_panel_kb())
+
+@router.message(
+    F.text.in_(
+        {
+            "👥 Пользователи",
+            "📊 Статистика",
+            "💰 Финансы",
+            "🗂 События на модерацию",
+            "🗂️ События на модерацию",
+        }
+    )
+)
+async def admin_panel_guard(message: Message, state: FSMContext):
+    """
+    Гард для reply-кнопок админки: если state слетел/не выставлен,
+    возвращаем админа в AdminState.panel и делегируем в существующие хэндлеры.
+    """
+    await _touch_from_message(message)
+
+    if not message.from_user or not is_admin(message.from_user.id):
+        return
+
+    # гарантируем состояние панели
+    await state.set_state(AdminState.panel)
+
+    txt = (message.text or "").strip()
+
+    if txt == "👥 Пользователи":
+        return await _send_users_page(message, page=0)
+
+    if txt.startswith("📊"):
+        return await admin_stats_message(message)
+
+    if txt.startswith("💰"):
+        return await admin_finance_stub(message)
+
+    if txt.startswith("🗂"):
+        return await admin_moderation_queue(message)
 
 
 @router.message(AdminState.panel, F.text.startswith("⬅️"))
@@ -581,12 +629,18 @@ async def admin_reject_reason(message: Message, state: FSMContext):
         event.reject_reason = reason
         await db.commit()
 
-        # Уведомляем организатора
+        ## Уведомляем организатора + даём кнопку "Исправить и отправить заново"
         await message.bot.send_message(
             event.user_id,
-            f"❌ Отклонено\n\nПричина отказа: {h(reason)}\n\nИсправьте и отправьте заявку повторно.",
+            (
+                f"❌ Отклонено\n\n"
+                f"Причина отказа: {h(reason)}\n\n"
+                f"Нажмите кнопку ниже, чтобы создать копию заявки и отправить её повторно."
+            ),
             parse_mode="HTML",
-        )
+            reply_markup=fix_reject_kb(event_id),
+)
+
 
         await message.answer(
             "❌ Заявка отклонена, организатор уведомлён.",
