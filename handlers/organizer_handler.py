@@ -53,6 +53,25 @@ def _parse_date(s: str) -> ddate:
 def _parse_time(s: str):
     return datetime.strptime(s, "%H:%M").time()
 
+def _get_any(obj, *names, default=None):
+    for n in names:
+        if hasattr(obj, n):
+            return getattr(obj, n)
+    return default
+
+def _set_any(obj, value, *names):
+    for n in names:
+        if hasattr(obj, n):
+            setattr(obj, n, value)
+            return True
+    return False
+
+def _col_name(model_cls, *names):
+    for n in names:
+        if hasattr(model_cls, n):
+            return n
+    return None
+
 
 CATEGORY_LABELS_RU = {
     "EXHIBITION": "🖼 Выставка",
@@ -284,6 +303,177 @@ def moderation_kb(event_id: int) -> InlineKeyboardMarkup:
     kb.adjust(2, 1)
     return kb.as_markup()
 
+@router.callback_query(F.data.startswith("org_fix:"))
+async def organizer_fix_and_resubmit(callback: CallbackQuery):
+    # --- helpers (если они уже есть в файле в другом месте — оставь только одну копию) ---
+    def _get_any(obj, *names, default=None):
+        for n in names:
+            if hasattr(obj, n):
+                return getattr(obj, n)
+        return default
+
+    def _set_any(obj, value, *names):
+        for n in names:
+            if hasattr(obj, n):
+                setattr(obj, n, value)
+                return True
+        return False
+
+    def _col_name(model_cls, *names):
+        for n in names:
+            if hasattr(model_cls, n):
+                return n
+        return None
+
+    try:
+        old_event_id = int(callback.data.split(":", 1)[1])
+    except Exception:
+        await callback.answer("Некорректные данные.", show_alert=True)
+        return
+
+    tg_user = callback.from_user
+    if not tg_user:
+        await callback.answer("Не удалось определить пользователя.", show_alert=True)
+        return
+
+    # --- динамически определяем реальные имена колонок ---
+    event_user_field = _col_name(Event, "user_id", "userid")
+    event_status_field = _col_name(Event, "status")
+    event_reject_field = _col_name(Event, "reject_reason", "rejectreason")
+    event_payment_field = _col_name(Event, "payment_status", "paymentstatus")
+
+    photo_event_field = _col_name(EventPhoto, "event_id", "eventid")
+    photo_file_field = _col_name(EventPhoto, "file_id", "fileid")
+    photo_pos_field = _col_name(EventPhoto, "position")
+
+    if not all([event_user_field, event_status_field, event_reject_field, event_payment_field]):
+        await callback.answer("Модель Event не соответствует ожиданиям.", show_alert=True)
+        return
+    if not all([photo_event_field, photo_file_field, photo_pos_field]):
+        await callback.answer("Модель EventPhoto не соответствует ожиданиям.", show_alert=True)
+        return
+
+    async with get_db() as db:
+        old_event = (await db.execute(select(Event).where(Event.id == old_event_id))).scalar_one_or_none()
+        if not old_event:
+            await callback.answer("Заявка не найдена.", show_alert=True)
+            return
+
+        if getattr(old_event, event_user_field, None) != tg_user.id:
+            await callback.answer("Это событие принадлежит другому пользователю.", show_alert=True)
+            return
+
+        if getattr(old_event, event_status_field) != EventStatus.REJECTED:
+            await callback.answer("Эту заявку нельзя переотправить (статус не REJECTED).", show_alert=True)
+            return
+
+        # --- 1) новая заявка-копия ---
+        new_event = Event()
+
+        # копируем поля безопасно (оба варианта нейминга)
+        for (src_names, dst_names) in [
+            (("user_id", "userid"), ("user_id", "userid")),
+            (("city_slug", "cityslug"), ("city_slug", "cityslug")),
+            (("title",), ("title",)),
+            (("category",), ("category",)),
+            (("description",), ("description",)),
+            (("contact_phone", "contactphone"), ("contact_phone", "contactphone")),
+            (("contact_email", "contactemail"), ("contact_email", "contactemail")),
+            (("location",), ("location",)),
+
+            (("price_admission", "priceadmission"), ("price_admission", "priceadmission")),
+            (("admission_price_json", "admissionpricejson"), ("admission_price_json", "admissionpricejson")),
+            (("free_kids_upto_age", "freekidsuptoage"), ("free_kids_upto_age", "freekidsuptoage")),
+
+            (("event_date", "eventdate"), ("event_date", "eventdate")),
+            (("event_time_start", "eventtimestart"), ("event_time_start", "eventtimestart")),
+            (("event_time_end", "eventtimeend"), ("event_time_end", "eventtimeend")),
+
+            (("period_start", "periodstart"), ("period_start", "periodstart")),
+            (("period_end", "periodend"), ("period_end", "periodend")),
+            (("working_hours_start", "workinghoursstart"), ("working_hours_start", "workinghoursstart")),
+            (("working_hours_end", "workinghoursend"), ("working_hours_end", "workinghoursend")),
+        ]:
+            _set_any(new_event, _get_any(old_event, *src_names, default=None), *dst_names)
+
+        setattr(new_event, event_status_field, EventStatus.PENDING_MODERATION)
+        setattr(new_event, event_payment_field, PaymentStatus.PENDING)
+        setattr(new_event, event_reject_field, None)
+
+        db.add(new_event)
+        await db.flush()
+        new_event_id = int(new_event.id)
+
+        # --- 2) фото ---
+        photo_event_col = getattr(EventPhoto, photo_event_field)
+        photo_pos_col = getattr(EventPhoto, photo_pos_field)
+
+        old_photos = (
+            await db.execute(
+                select(EventPhoto)
+                .where(photo_event_col == old_event_id)
+                .order_by(photo_pos_col.asc())
+            )
+        ).scalars().all()
+
+        await db.execute(delete(EventPhoto).where(photo_event_col == new_event_id))
+        await db.flush()
+
+        for idx, p in enumerate(old_photos[:5], start=1):
+            np = EventPhoto()
+            setattr(np, photo_event_field, new_event_id)
+            setattr(np, photo_file_field, getattr(p, photo_file_field))
+            setattr(np, photo_pos_field, idx)
+            db.add(np)
+
+    # --- 3) уведомления ---
+    old_reason = _get_any(old_event, "reject_reason", "rejectreason", default=None)
+    if old_reason:
+        await callback.message.answer(
+            f"✅ Создана копия заявки (ID: {new_event_id}) и отправлена на модерацию.\n"
+            f"Причина прошлого отказа: {h(old_reason)}",
+            parse_mode="HTML",
+            reply_markup=organizer_menu_kb(),
+        )
+    else:
+        await callback.message.answer(
+            f"✅ Создана копия заявки (ID: {new_event_id}) и отправлена на модерацию.",
+            parse_mode="HTML",
+            reply_markup=organizer_menu_kb(),
+        )
+
+    async with get_db() as db:
+        first_photo = (
+            await db.execute(
+                select(EventPhoto)
+                .where(getattr(EventPhoto, photo_event_field) == new_event_id)
+                .order_by(getattr(EventPhoto, photo_pos_field).asc())
+            )
+        ).scalars().first()
+
+    admin_text = f"🆕 Повторная заявка (копия отклонённой)\nID: {new_event_id}"
+    for admin_id in ADMIN_IDS:
+        try:
+            if first_photo:
+                await callback.bot.send_photo(
+                    admin_id,
+                    photo=getattr(first_photo, photo_file_field),
+                    caption=admin_text,
+                    reply_markup=moderation_kb(new_event_id),
+                )
+            else:
+                await callback.bot.send_message(
+                    admin_id,
+                    admin_text,
+                    reply_markup=moderation_kb(new_event_id),
+                )
+        except Exception:
+            pass
+
+    await callback.answer()
+
+
+
 def photos_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.button(text="✅ Готово", callback_data="org_photos:done")
@@ -461,30 +651,6 @@ async def organizer_choose_city_from_bottom(message: Message, state: FSMContext)
         parse_mode="HTML",
     )
 
-
-@router.callback_query(F.data.startswith("org_city:"), OrganizerEvent.city)
-async def organizer_city(callback: CallbackQuery, state: FSMContext):
-    slug = callback.data.split(":")[1]
-    info = CITIES.get(slug)
-
-    if not info:
-        await callback.answer("Город не найден", show_alert=True)
-        return
-
-    if info.get("status") != "active":
-        await callback.message.answer(f"{h(info['name'])} пока недоступен.", parse_mode="HTML")
-        await callback.answer()
-        return
-
-    await state.update_data(city_slug=slug, city_name=info["name"])
-    await state.set_state(OrganizerEvent.category)
-
-    await callback.message.answer(
-        f"Город: <b>{h(info['name'])}</b>\nВыберите категорию:",
-        reply_markup=categories_kb(),
-        parse_mode="HTML",
-    )
-    await callback.answer()
 
 ORG_CATEGORY_TEXT_TO_CODE = {
     "🖼 Выставка": "EXHIBITION",
