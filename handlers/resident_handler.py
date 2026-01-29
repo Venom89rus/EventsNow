@@ -166,7 +166,7 @@ def category_kb() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="🧩 Все категории")],
             [KeyboardButton(text="🖼 Выставка"), KeyboardButton(text="🧑🏫 Мастер-класс")],
-            [KeyboardButton(text="🎤 Концерт"), KeyboardButton(text="🎭 Выступление")],
+            [KeyboardButton(text="🎤 Концерт"), KeyboardButton(text="🎭 Спектакль")],
             [KeyboardButton(text="🎓 Лекция/семинар"), KeyboardButton(text="✨ Другое")],
             [KeyboardButton(text="⬅️ Назад")],
         ],
@@ -215,7 +215,7 @@ def category_ru(cat: EventCategory | str) -> str:
         "EXHIBITION": "Выставка",
         "MASTERCLASS": "Мастер-класс",
         "CONCERT": "Концерт",
-        "PERFORMANCE": "Выступление",
+        "PERFORMANCE": "Спектакль",
         "LECTURE": "Лекция/семинар",
         "OTHER": "Другое",
     }
@@ -494,7 +494,7 @@ def event_preview_text(e: Event) -> str:
         f"{h(cat)}\n\n"
         f"Когда: {h(fmt_when(e))}\n"
         f"Где: {h(e.location)}\n"
-        f"Цена: {h(fmt_price(e))}\n\n"
+        f"Цена от: {h(fmt_price(e))}\n\n"
         f"{h(short(e.description))}"
     )
 
@@ -651,7 +651,7 @@ TEXT_TO_CATEGORY: dict[str, EventCategory | None] = {
     "🖼 Выставка": EventCategory.EXHIBITION,
     "🧑🏫 Мастер-класс": EventCategory.MASTERCLASS,
     "🎤 Концерт": EventCategory.CONCERT,
-    "🎭 Выступление": EventCategory.PERFORMANCE,
+    "🎭 Спектакль": EventCategory.PERFORMANCE,
     "🎓 Лекция/семинар": EventCategory.LECTURE,
     "✨ Другое": EventCategory.OTHER,
 }

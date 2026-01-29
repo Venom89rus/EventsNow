@@ -67,7 +67,7 @@ PRICING_CONFIG = {
         },
     },
     "PERFORMANCE": {
-        "name": "Выступление",
+        "name": "Спектакль",
         "model": "daily",
         "packages": {
             "1_day": 499,

@@ -58,7 +58,7 @@ def category_ru(cat: EventCategory | str) -> str:
         "EXHIBITION": "Выставка",
         "MASTERCLASS": "Мастер-класс",
         "CONCERT": "Концерт",
-        "PERFORMANCE": "Выступление",
+        "PERFORMANCE": "Спектакль",
         "LECTURE": "Лекция/семинар",
         "OTHER": "Другое",
     }
