@@ -253,7 +253,7 @@ def categories_kb() -> InlineKeyboardMarkup:
     kb.button(text="🖼 Выставка", callback_data="org_cat:EXHIBITION")
     kb.button(text="🧑🏫 Мастер-класс", callback_data="org_cat:MASTERCLASS")
     kb.button(text="🎤 Концерт", callback_data="org_cat:CONCERT")
-    kb.button(text="🎭 Выступление", callback_data="org_cat:PERFORMANCE")
+    kb.button(text="🎭 Спектакль", callback_data="org_cat:PERFORMANCE")
     kb.button(text="🎓 Лекция/семинар", callback_data="org_cat:LECTURE")
     kb.button(text="✨ Другое", callback_data="org_cat:OTHER")
     kb.adjust(2)
@@ -263,7 +263,7 @@ def organizer_categories_choice_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🖼 Выставка"), KeyboardButton(text="🧑‍🏫🏛 Мастер-класс")],
-            [KeyboardButton(text="🎤 Концерт"), KeyboardButton(text="🎭 Выступление")],
+            [KeyboardButton(text="🎤 Концерт"), KeyboardButton(text="🎭 Спектакль")],
             [KeyboardButton(text="🎓 Лекция/семинар"), KeyboardButton(text="✨ Другое")],
             [KeyboardButton(text="⬅️ Назад")],
         ],
